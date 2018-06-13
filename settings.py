@@ -104,6 +104,12 @@ DATABASES = {
         'PASSWORD': 'secret',
         'HOST': 'local.sandwhichi.com',
         'PORT': '33061',
+        'OPTIONS': {
+            'sql_mode': 'TRADITIONAL',
+            'charset': 'utf8mb4',
+            'init_command': 'SET default_storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_general_ci',
+            'compress': True
+        },
     }
 }
 
