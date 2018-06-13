@@ -20,14 +20,14 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, username, password):
+    def create_superuser(self, email, username, has_terms, has_privacy_policy, password=None):
 
         user = self.create_user(
             email,
             password=password,
             username=username,
-            has_terms=True,
-            has_privacy_policy=True
+            has_terms=has_terms,
+            has_privacy_policy=has_privacy_policy
         )
         user.is_admin = True
         user.save(using=self._db)
