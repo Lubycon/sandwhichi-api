@@ -4,11 +4,9 @@ from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin
 )
 from .managers import UserManager
-from base.mixins.timestamp import (
-    AutoCreatedUpdatedMixin, SoftDeleteMixin,
-)
+from base.mixins.soft_delete import SoftDeleteMixin
 
-class User(AbstractBaseUser, PermissionsMixin, AutoCreatedUpdatedMixin, SoftDeleteMixin):
+class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin):
     # _()은 i18n 될 수 있는 함수를 의미
 
     class Meta:
@@ -20,6 +18,8 @@ class User(AbstractBaseUser, PermissionsMixin, AutoCreatedUpdatedMixin, SoftDele
     has_privacy_policy = models.BooleanField(default=False, )
     is_active = models.BooleanField(default=True, )
     is_admin = models.BooleanField(default=False, )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'email'

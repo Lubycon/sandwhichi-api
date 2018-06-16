@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'account.apps.AccountConfig',
+    'common.apps.CommonConfig',
     'user.apps.UserConfig',
     'project.apps.ProjectConfig',
     'location.apps.LocationConfig',
