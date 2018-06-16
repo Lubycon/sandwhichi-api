@@ -8,8 +8,8 @@ class ContactType(SoftDeleteMixin, models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class Contact(SoftDeleteMixin, models.Model):
-    pass
+# class Contact(SoftDeleteMixin, models.Model):
+#     pass
 
 
 class MediaType(SoftDeleteMixin, models.Model):
@@ -18,5 +18,5 @@ class MediaType(SoftDeleteMixin, models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class Media(SoftDeleteMixin, models.Model):
-    pass
+# class Media(SoftDeleteMixin, models.Model):
+#     pass
