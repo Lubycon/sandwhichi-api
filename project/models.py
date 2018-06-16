@@ -1,6 +1,6 @@
 from django.db import models
 from base.mixins.soft_delete import SoftDeleteMixin
-from common.models import Contact, Media
+from common.models import Contact, Media, Ability, Keyword
 
 
 class Project(SoftDeleteMixin, models.Model):
@@ -16,3 +16,5 @@ class Project(SoftDeleteMixin, models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     media = models.ManyToManyField(Contact)
     contacts = models.ManyToManyField(Media)
+    abilities = models.ManyToManyField(Ability)
+    keywords = models.ManyToManyField(Keyword)

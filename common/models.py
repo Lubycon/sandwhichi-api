@@ -26,3 +26,17 @@ class Media(SoftDeleteMixin, models.Model):
     url = models.URLField(max_length=500, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
+
+
+class Ability(SoftDeleteMixin, models.Model):
+    name = models.CharField(max_length=30, db_index=True, unique=True)
+    count = models.IntegerField(max_length=10, )
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
+
+
+class Keyword(SoftDeleteMixin, models.Model):
+    name = models.CharField(max_length=30, db_index=True, unique=True)
+    count = models.IntegerField(max_length=10, )
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
