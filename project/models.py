@@ -1,5 +1,7 @@
 from django.db import models
 from base.mixins.soft_delete import SoftDeleteMixin
+from common.models import Contact, Media
+
 
 class Project(SoftDeleteMixin, models.Model):
     class Meta:
@@ -12,3 +14,5 @@ class Project(SoftDeleteMixin, models.Model):
     ends_at = models.DateTimeField(blank=True, )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    media = models.ManyToManyField(Contact)
+    contacts = models.ManyToManyField(Media)
