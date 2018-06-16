@@ -28,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['local.sandwhichi.com']
 
-
 # Application definition
 AUTH_USER_MODEL = 'user.User'
 INSTALLED_APPS = [
@@ -42,6 +41,8 @@ INSTALLED_APPS = [
 
     'account.apps.AccountConfig',
     'user.apps.UserConfig',
+    'project.apps.ProjectConfig',
+    'location.apps.LocationConfig',
 ]
 
 MIDDLEWARE = [
@@ -148,7 +149,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

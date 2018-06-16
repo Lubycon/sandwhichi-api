@@ -1,4 +1,3 @@
-from django.utils import timezone
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import (
@@ -9,16 +8,11 @@ from base.mixins.timestamp import (
     AutoCreatedUpdatedMixin, SoftDeleteMixin,
 )
 
-class User(
-    AbstractBaseUser,
-    PermissionsMixin,
-    AutoCreatedUpdatedMixin,
-    SoftDeleteMixin
-):
+class User(AbstractBaseUser, PermissionsMixin, AutoCreatedUpdatedMixin, SoftDeleteMixin):
     # _()은 i18n 될 수 있는 함수를 의미
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('-created_at', )
 
     email = models.EmailField(max_length=255, unique=True, )
     username = models.CharField(max_length=30, )

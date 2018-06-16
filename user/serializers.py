@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from user.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import status
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 class SignupUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, min_length=2, max_length=30)
