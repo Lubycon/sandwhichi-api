@@ -2,25 +2,7 @@ import datetime
 from django.db import models
 from base.mixins.soft_delete import SoftDeleteMixin
 from common.models import Contact, Media, Ability, Keyword
-
-
-class Project(SoftDeleteMixin, models.Model):
-    class Meta:
-        ordering = ('-created_at', )
-
-    title = models.CharField(max_length=100, )
-    description = models.TextField()
-    profile_image = models.URLField(max_length=500, )
-    started_at = models.DateTimeField(blank=True, )
-    ends_at = models.DateTimeField(blank=True, )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    media = models.ManyToManyField(Contact)
-    contacts = models.ManyToManyField(Media)
-    abilities = models.ManyToManyField(Ability)
-    keywords = models.ManyToManyField(Keyword)
-    created_at = models.DateTimeField(auto_now_add=True, )
-    updated_at = models.DateTimeField(auto_now=True, )
+from user.models import User
 
 
 class Schedule(SoftDeleteMixin, models.Model):
@@ -48,3 +30,48 @@ class ScheduleRecurringType(SoftDeleteMixin, models.Model):
     name = models.CharField(max_length=20, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
+
+
+class DescriptionQuestion(SoftDeleteMixin, models.Model):
+    class Meta:
+        ordering = ('-created_at', )
+
+    question = models.CharField(max_length=255, )
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
+
+
+class ProjectDescription(SoftDeleteMixin, models.Model):
+    class Meta:
+        ordering = ('-created_at', )
+
+    question = models.ForeignKey(DescriptionQuestion, on_delete=models.PROTECT, )
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
+
+
+class Project(SoftDeleteMixin, models.Model):
+    class Meta:
+        ordering = ('-created_at', )
+
+    title = models.CharField(max_length=100, )
+    description = models.ForeignKey(ProjectDescription, on_delete=models.PROTECT, )
+    profile_image = models.URLField(max_length=500, )
+    started_at = models.DateTimeField(blank=True, )
+    ends_at = models.DateTimeField(blank=True, )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    media = models.ManyToManyField(Contact)
+    contacts = models.ManyToManyField(Media)
+    abilities = models.ManyToManyField(Ability)
+    keywords = models.ManyToManyField(Keyword)
+
+
+class ProjectUserView(models.Model):
+    class Meta:
+        ordering = ('-created_at', )
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, )
