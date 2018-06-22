@@ -3,16 +3,16 @@ from common.models import (
     Contact, Media, Ability, Keyword
 )
 
-class ContactSerializer(serializers.ModelSerializer):
+class ContactCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ('id', 'type', 'information')
+        fields = ('type', 'information')
 
 
-class MediaSerializer(serializers.ModelSerializer):
+class MediaCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
-        fields = ('id', 'type', 'url')
+        fields = ('type', 'url')
 
 
 class AbilitySerializer(serializers.ModelSerializer):

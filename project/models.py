@@ -46,8 +46,8 @@ class Project(SoftDeleteMixin, models.Model):
     ends_at = models.DateField(blank=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
-    media = models.ManyToManyField(Contact)
-    contacts = models.ManyToManyField(Media)
+    media = models.ManyToManyField(Media)
+    contacts = models.ManyToManyField(Contact)
     abilities = models.ManyToManyField(Ability)
     keywords = models.ManyToManyField(Keyword)
 
