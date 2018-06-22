@@ -42,8 +42,8 @@ class Project(SoftDeleteMixin, models.Model):
 
     title = models.CharField(max_length=100, )
     profile_image = models.URLField(max_length=500, )
-    started_at = models.DateTimeField(blank=True, )
-    ends_at = models.DateTimeField(blank=True, )
+    started_at = models.DateField(blank=True, )
+    ends_at = models.DateField(blank=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
     media = models.ManyToManyField(Contact)
