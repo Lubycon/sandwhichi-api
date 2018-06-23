@@ -9,7 +9,7 @@ from common.models import (
     Ability, Keyword, Contact, Media,
 )
 from common.serializers import (
-    ContactSerializer, MediaSerializer,
+    ContactSerializer, MediaSerializer, AbilitySerializer, KeywordSerializer
 )
 
 
@@ -37,11 +37,18 @@ class ProjectDescriptionSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    descriptions = serializers.SerializerMethodField()
+    media = MediaSerializer(many=True, )
+    contacts = ContactSerializer(many=True, )
+    abilities = AbilitySerializer(many=True, )
+    keywords = KeywordSerializer(many=True, )
+
     class Meta:
         model = Project
         fields = (
+            'id',
             'title',
-            'description',
+            'descriptions',
             'profile_image',
             'started_at',
             'ends_at',
@@ -50,6 +57,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             'abilities',
             'keywords'
         )
+    
+    def get_descriptions(self, obj):
+        descriptions = ProjectDescription.objects.filter(project=obj.id)
+        return ProjectDescriptionSerializer(descriptions, many=True).data
 
 
 class ProjectCreateSerializer(serializers.ModelSerializer):
