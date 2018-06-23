@@ -9,7 +9,9 @@ from common.models import (
     Ability, Keyword, Contact, Media,
 )
 from common.serializers import (
-    ContactSerializer, MediaSerializer, AbilitySerializer, KeywordSerializer
+    ContactSerializer, ContactCreateSerializer,
+    MediaSerializer, MediaCreateSerializer,
+    AbilitySerializer, KeywordSerializer
 )
 
 
@@ -30,10 +32,23 @@ class DescriptionQuestionSerializer(serializers.ModelSerializer):
         fields = ('id', 'question')
 
 
-class ProjectDescriptionSerializer(serializers.ModelSerializer):
+class ProjectDescriptionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectDescription
         fields = ('question', 'answer')
+
+
+class ProjectDescriptionSerializer(serializers.ModelSerializer):
+    question = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProjectDescription
+        fields = ('question', 'answer')
+    
+    def get_question(self, obj):
+        print(obj.question)
+        question = DescriptionQuestion.objects.get(pk=obj.question.id)
+        return DescriptionQuestionSerializer(question).data['question']
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -64,9 +79,9 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectCreateSerializer(serializers.ModelSerializer):
-    descriptions = ProjectDescriptionSerializer(many=True, )
-    media = MediaSerializer(many=True, )
-    contacts = ContactSerializer(many=True, )
+    descriptions = ProjectDescriptionCreateSerializer(many=True, )
+    media = MediaCreateSerializer(many=True, )
+    contacts = ContactCreateSerializer(many=True, )
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())
 
