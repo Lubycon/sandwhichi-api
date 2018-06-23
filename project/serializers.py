@@ -9,7 +9,7 @@ from common.models import (
     Ability, Keyword, Contact, Media,
 )
 from common.serializers import (
-    ContactCreateSerializer, MediaCreateSerializer,
+    ContactSerializer, MediaSerializer,
 )
 
 
@@ -33,13 +33,7 @@ class DescriptionQuestionSerializer(serializers.ModelSerializer):
 class ProjectDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectDescription
-        fields = ('project', 'question', 'answer')
-
-    def create(self, validated_data):
-        print('validated -> ', validated_data)
-        new_project_description = ProjectDescription.objects.create(**validated_data)
-        new_project_description.save()
-        return new_project_description
+        fields = ('question', 'answer')
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -60,8 +54,8 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class ProjectCreateSerializer(serializers.ModelSerializer):
     descriptions = ProjectDescriptionSerializer(many=True, )
-    media = MediaCreateSerializer(many=True, )
-    contacts = ContactCreateSerializer(many=True, )
+    media = MediaSerializer(many=True, )
+    contacts = ContactSerializer(many=True, )
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())
 
@@ -91,21 +85,26 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         project.save()
 
         for description_data in descriptions_data:
-            description_data['project'] = project.id
-            description_data['question'] = description_data['question'].id
-            description = ProjectDescriptionSerializer(data=description_data)
-            if description.is_valid():
-                description.save()
-            else:
-                raise ValueError(description.errors)
+            description = ProjectDescription(
+                project=project,
+                question=description_data['question'],
+                answer=description_data['answer']
+            )
+            description.save()
 
         for media_data_object in media_data:
-            media = Media(type=media_data_object['type'], url=media_data_object['url'])
+            media = Media(
+                type=media_data_object['type'],
+                url=media_data_object['url']
+            )
             media.save()
             project.media.add(media)
 
         for contact_data in contacts_data:
-            contact = Contact(type=contact_data['type'], information=contact_data['information'])
+            contact = Contact(
+                type=contact_data['type'],
+                information=contact_data['information']
+            )
             contact.save()
             project.contacts.add(contact)
 

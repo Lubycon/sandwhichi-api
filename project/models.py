@@ -59,8 +59,8 @@ class ProjectUserView(models.Model):
 
 
 class ProjectDescription(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, )
-    question = models.ForeignKey(DescriptionQuestion, on_delete=models.PROTECT, null=True, )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, )
+    question = models.ForeignKey(DescriptionQuestion, on_delete=models.PROTECT, )
     answer = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
