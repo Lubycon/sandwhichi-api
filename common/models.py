@@ -30,13 +30,13 @@ class Media(SoftDeleteMixin, models.Model):
 
 class Ability(SoftDeleteMixin, models.Model):
     name = models.CharField(max_length=30, unique=True, )
-    count = models.IntegerField(default=0, )
+    count = models.IntegerField(default=1, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
 
 
 class Keyword(SoftDeleteMixin, models.Model):
     name = models.CharField(max_length=30, unique=True, )
-    count = models.IntegerField(default=0, )
+    count = models.IntegerField(default=1, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )

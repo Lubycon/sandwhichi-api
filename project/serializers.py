@@ -30,10 +30,16 @@ class DescriptionQuestionSerializer(serializers.ModelSerializer):
         fields = ('id', 'question')
 
 
-class ProjectDescriptionCreateSerializer(serializers.ModelSerializer):
+class ProjectDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectDescription
         fields = ('project', 'question', 'answer')
+
+    def create(self, validated_data):
+        print('validated -> ', validated_data)
+        new_project_description = ProjectDescription.objects.create(**validated_data)
+        new_project_description.save()
+        return new_project_description
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -41,7 +47,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = (
             'title',
-            'descriptions',
+            'description',
             'profile_image',
             'started_at',
             'ends_at',
@@ -53,7 +59,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectCreateSerializer(serializers.ModelSerializer):
-    descriptions = ProjectDescriptionCreateSerializer(many=True, )
+    descriptions = ProjectDescriptionSerializer(many=True, )
     media = MediaCreateSerializer(many=True, )
     contacts = ContactCreateSerializer(many=True, )
     abilities = serializers.ListField(child=serializers.CharField())
@@ -81,14 +87,17 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         media_data = validated_data.pop('media')
         contacts_data = validated_data.pop('contacts')
 
-        project = Project(**validated_data)
+        project = Project.objects.create(**validated_data)
         project.save()
-        
+
         for description_data in descriptions_data:
             description_data['project'] = project.id
-            description_serializer = ProjectDescriptionCreateSerializer(data=description_data)    
-            if description_serializer.is_valid():
-                description = description_serializer.save()
+            description_data['question'] = description_data['question'].id
+            description = ProjectDescriptionSerializer(data=description_data)
+            if description.is_valid():
+                description.save()
+            else:
+                raise ValueError(description.errors)
 
         for media_data_object in media_data:
             media = Media(type=media_data_object['type'], url=media_data_object['url'])
@@ -105,8 +114,7 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
 
             if not created:
                 new_count = ability.count + 1
-                print(ability)
-                ability.update(count=new_count)
+                ability.count = new_count
             ability.save()
             project.abilities.add(ability)
         
@@ -115,7 +123,7 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
 
             if not created:
                 new_count = keyword.count + 1
-                keyword.update(count=new_count)
+                keyword.count = new_count
             keyword.save()
             project.keywords.add(keyword)
         

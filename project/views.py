@@ -40,9 +40,6 @@ class ProjectViewSet(APIView):
         if serializer.is_valid():
             project = serializer.save()
             if project:
-                print('project created!')
-                print(project)
-
-                return Response(project, status=status.HTTP_201_CREATED)
+                return Response({}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
