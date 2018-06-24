@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from django.db import transaction
-from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist, )
 from project.models import (
-    Project, Schedule, DescriptionQuestion,
+    Project, DescriptionQuestion,
     ProjectDescription, ScheduleRecurringType, Schedule,
 )
 from common.models import (
     Ability, Keyword, Contact, Media,
 )
+from location.models import Location
 from common.serializers import (
     ContactSerializer, ContactCreateSerializer,
     MediaSerializer, MediaCreateSerializer,
@@ -122,6 +122,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
     schedule = ScheduleCreateSerializer()
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())
+    location_code = serializers.CharField(source='location')
 
     class Meta:
         model = Project
@@ -136,9 +137,9 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             'abilities',
             'keywords',
             'schedule',
-            'location',
+            'location_code',
         )
-    
+
     @transaction.atomic
     def create(self, validated_data):
         descriptions_data = validated_data.pop('descriptions')
@@ -155,12 +156,14 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         else:
             raise ValueError(schedule_serializer.errors)
 
+        location = Location.objects.get(address_2_code=validated_data['location'])
+
         project = Project.objects.create(
             title=validated_data['title'],
             profile_image=validated_data['profile_image'],
             started_at=validated_data['started_at'],
             ends_at=validated_data['ends_at'],
-            location=validated_data['location'],
+            location=location,
             schedule=schedule
         )
         project.save()
