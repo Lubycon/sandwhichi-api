@@ -76,7 +76,7 @@ class ProjectDescriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectDescription
-        fields = ('question', 'answer')
+        fields = ('id', 'question', 'answer')
     
     def get_question(self, obj):
         print(obj.question)
@@ -211,8 +211,5 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         project.save()
         return project
 
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        print(instance)
 
     

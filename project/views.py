@@ -56,15 +56,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializers = ProjectSerializer(project)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, pk=kwargs.get('pk'))
-        serializers = ProjectSaveSerializer(project, data=request.data)
-        if serializers.is_valid():
-            project = serializers.save()
-            if project:
-                return Response(project, status=status.HTTP_200_OK)
-
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, *args, **kwargs):
+        # project = get_object_or_404(Project, pk=kwargs.get('pk'))
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))

@@ -10,7 +10,7 @@ project_list = project_views.ProjectViewSet.as_view({
 
 project_detail = project_views.ProjectViewSet.as_view({
     'get': 'retrieve',
-    'patch': 'patch',
+    'put': 'put',
     'delete': 'destroy',
 })
 
