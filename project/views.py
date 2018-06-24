@@ -7,7 +7,7 @@ from project.models import (
 )
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
-    ProjectCreateSerializer, ProjectSerializer
+    ProjectSaveSerializer, ProjectSerializer
 )
 
 class ScheduleRecurringTypeViewSet(APIView):
@@ -40,11 +40,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = ProjectCreateSerializer(data=request.data)
+        serializer = ProjectSaveSerializer(data=request.data)
         if serializer.is_valid():
             project = serializer.save()
             if project:
-                return Response({}, status=status.HTTP_201_CREATED)
+                return Response(project, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -55,11 +55,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = get_object_or_404(Project, pk=kwargs.get('pk'))
         serializers = ProjectSerializer(project)
         return Response(serializers.data, status=status.HTTP_200_OK)
-    
-    def destroy(self, request, *args, **kwargs):
-        pass
 
     def patch(self, request, *args, **kwargs):
-        pass
+        project = get_object_or_404(Project, pk=kwargs.get('pk'))
+        serializers = ProjectSaveSerializer(project, data=request.data)
+        if serializers.is_valid():
+            project = serializers.save()
+            if project:
+                return Response(project, status=status.HTTP_200_OK)
 
-    
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        print(project)
+        project.delete()
+        return Response({}, status=status.HTTP_204_NO_CONTENT)

@@ -115,7 +115,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         return ProjectDescriptionSerializer(descriptions, many=True).data
 
 
-class ProjectCreateSerializer(serializers.ModelSerializer):
+class ProjectSaveSerializer(serializers.ModelSerializer):
     descriptions = ProjectDescriptionCreateSerializer(many=True, )
     media = MediaCreateSerializer(many=True, )
     contacts = ContactCreateSerializer(many=True, )
@@ -149,7 +149,6 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         schedule_data = validated_data.pop('schedule')
 
         # One to One
-        print(validated_data)
         schedule_serializer = ScheduleCreateSerializer(data=schedule_data)
         if schedule_serializer.is_valid():
             schedule = schedule_serializer.save()
@@ -165,7 +164,6 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
             schedule=schedule
         )
         project.save()
-
 
         # Many to Many
         for description_data in descriptions_data:
@@ -212,8 +210,9 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         
         project.save()
         return project
-        
 
-            
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        print(instance)
 
     
