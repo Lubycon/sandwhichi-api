@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^', include('account.urls', namespace='account')),
     url(r'^', include('project.urls', namespace='project')),
+    url(r'^', include('location.urls', namespace='location')),
 ]

@@ -3,7 +3,7 @@ from django.db import transaction
 from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist, )
 from project.models import (
     Project, Schedule, DescriptionQuestion,
-    ProjectDescription, ScheduleRecurringType,
+    ProjectDescription, ScheduleRecurringType, Schedule,
 )
 from common.models import (
     Ability, Keyword, Contact, Media,
@@ -13,6 +13,7 @@ from common.serializers import (
     MediaSerializer, MediaCreateSerializer,
     AbilitySerializer, KeywordSerializer
 )
+from location.serializers import LocationSerializer
 
 
 class ScheduleRecurringTypeSerializer(serializers.ModelSerializer):
@@ -21,9 +22,41 @@ class ScheduleRecurringTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', )
 
 
-class ScheduleSerializer(serializers.ModelSerializer):
+class ScheduleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
+        fields = (
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+            'is_negotiable',
+            'recurring_type',
+            'start_time',
+            'end_time',
+        )
+
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    recurring_type = ScheduleRecurringTypeSerializer()
+    class Meta:
+        model = Schedule
+        fields = (
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+            'is_negotiable',
+            'recurring_type',
+            'start_time',
+            'end_time',
+        )
 
 
 class DescriptionQuestionSerializer(serializers.ModelSerializer):
@@ -57,6 +90,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True, )
     abilities = AbilitySerializer(many=True, )
     keywords = KeywordSerializer(many=True, )
+    schedule = ScheduleSerializer()
+    location = LocationSerializer()
 
     class Meta:
         model = Project
@@ -70,7 +105,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             'media',
             'contacts',
             'abilities',
-            'keywords'
+            'keywords',
+            'schedule',
+            'location',
         )
     
     def get_descriptions(self, obj):
@@ -82,6 +119,7 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
     descriptions = ProjectDescriptionCreateSerializer(many=True, )
     media = MediaCreateSerializer(many=True, )
     contacts = ContactCreateSerializer(many=True, )
+    schedule = ScheduleCreateSerializer()
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())
 
@@ -96,7 +134,9 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
             'media',
             'contacts',
             'abilities',
-            'keywords'
+            'keywords',
+            'schedule',
+            'location',
         )
     
     @transaction.atomic
@@ -106,10 +146,28 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         keywords_data = validated_data.pop('keywords')
         media_data = validated_data.pop('media')
         contacts_data = validated_data.pop('contacts')
+        schedule_data = validated_data.pop('schedule')
 
-        project = Project.objects.create(**validated_data)
+        # One to One
+        print(validated_data)
+        schedule_serializer = ScheduleCreateSerializer(data=schedule_data)
+        if schedule_serializer.is_valid():
+            schedule = schedule_serializer.save()
+        else:
+            raise ValueError(schedule_serializer.errors)
+
+        project = Project.objects.create(
+            title=validated_data['title'],
+            profile_image=validated_data['profile_image'],
+            started_at=validated_data['started_at'],
+            ends_at=validated_data['ends_at'],
+            location=validated_data['location'],
+            schedule=schedule
+        )
         project.save()
 
+
+        # Many to Many
         for description_data in descriptions_data:
             description = ProjectDescription(
                 project=project,

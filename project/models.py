@@ -1,7 +1,10 @@
 import datetime
 from django.db import models
 from base.mixins.soft_delete import SoftDeleteMixin
-from common.models import Contact, Media, Ability, Keyword
+from common.models import (
+    Contact, Media, Ability, Keyword
+)
+from location.models import Location
 from user.models import User
 
 
@@ -12,9 +15,6 @@ class ScheduleRecurringType(SoftDeleteMixin, models.Model):
 
 
 class Schedule(SoftDeleteMixin, models.Model):
-    class Meta:
-        ordering = ('-created_at', )
-    
     monday = models.BooleanField(default=False, )
     tuesday = models.BooleanField(default=False, )
     wednesday = models.BooleanField(default=False, )
@@ -50,6 +50,8 @@ class Project(SoftDeleteMixin, models.Model):
     contacts = models.ManyToManyField(Contact)
     abilities = models.ManyToManyField(Ability)
     keywords = models.ManyToManyField(Keyword)
+    schedule = models.OneToOneField(Schedule, on_delete=models.PROTECT, )
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, )
 
 
 class ProjectUserView(models.Model):
