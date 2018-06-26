@@ -63,6 +63,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination',
+    'PAGE_SIZE': 20,
 }
 
 JWT_AUTH = {
@@ -157,3 +159,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Social Access
+NAVER_LOGIN_CLIENT_ID = 'HAjQ7lH1Jk8PqJUeHajh'
+NAVER_LOGIN_SECRET = 'hI6ia8l3HQ'
+GOOGLE_PLUS_CLIENT_ID = '910544055896-tiucajkqq3pt6l38v7kge5h6q20cs3ai.apps.googleusercontent.com'
+GOOGLE_PLUS_SECRET= '-NB71lIhG2lj5spc4IZGZ5Mf'

@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
+from rest_framework.filters import OrderingFilter
 from project.models import (
     Project, ScheduleRecurringType, DescriptionQuestion
 )
@@ -38,6 +39,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    filter_backends = (OrderingFilter,)
+    ordering = '-created_at'
 
     def create(self, request, *args, **kwargs):
         serializer = ProjectSaveSerializer(data=request.data)
@@ -49,7 +52,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request, *args, **kwargs):
-        pass
+        ordering = '-created'
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True, )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def retrieve(self, request, *args, **kwargs):
         project = get_object_or_404(Project, pk=kwargs.get('pk'))

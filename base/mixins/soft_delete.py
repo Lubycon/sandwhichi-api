@@ -31,7 +31,6 @@ class SoftDeleteManager(models.Manager):
         return self.get_queryset().hard_delete()
 
 class SoftDeleteMixin(models.Model):
-
     deleted_at = models.DateTimeField(blank=True, null=True, )
     objects = SoftDeleteManager()
     all_objects = SoftDeleteManager(alive_only=False)
