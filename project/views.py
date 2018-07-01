@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
+from common.models import Ability, Keyword
 from project.models import (
     Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription,
     Media
@@ -149,3 +151,64 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def add_ability(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        ability_string = request.data.get('ability')
+        try:
+            project.abilities.get(name=ability_string)
+            return Response({}, status=status.HTTP_409_CONFLICT)
+        except ObjectDoesNotExist:
+            ability, created = Ability.objects.get_or_create(name=ability_string)
+            new_count = ability.count + 1
+            ability.count = new_count
+            ability.save()
+            project.abilities.add(ability)
+
+            serializer = ProjectSerializer(project)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def remove_ability(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        ability = get_object_or_404(project.abilities, id=kwargs.get('ability_id'))
+
+        new_count = ability.count - 1
+        ability.count = new_count
+        ability.save()
+        project.abilities.remove(ability)
+
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def add_keyword(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        keyword_string = request.data.get('keyword')
+        try:
+            project.keywords.get(name=keyword_string)
+            return Response({}, status=status.HTTP_409_CONFLICT)
+        except ObjectDoesNotExist:
+            keyword, created = Keyword.objects.get_or_create(name=keyword_string)
+            new_count = keyword.count + 1
+            keyword.count = new_count
+            keyword.save()
+            project.keywords.add(keyword)
+
+            serializer = ProjectSerializer(project)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def remove_keyword(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        keyword = get_object_or_404(project.keywords, id=kwargs.get('keyword_id'))
+
+        new_count = keyword.count - 1
+        keyword.count = new_count
+        keyword.save()
+        project.keywords.remove(keyword)
+
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
