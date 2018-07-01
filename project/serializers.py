@@ -60,9 +60,10 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class DescriptionQuestionSerializer(serializers.ModelSerializer):
+    content = serializers.CharField(source='question')
     class Meta:
         model = DescriptionQuestion
-        fields = ('id', 'question')
+        fields = ('id', 'content')
 
 
 class ProjectDescriptionCreateSerializer(serializers.ModelSerializer):
@@ -79,9 +80,8 @@ class ProjectDescriptionSerializer(serializers.ModelSerializer):
         fields = ('id', 'question', 'answer')
     
     def get_question(self, obj):
-        print(obj.question)
         question = DescriptionQuestion.objects.get(pk=obj.question.id)
-        return DescriptionQuestionSerializer(question).data['question']
+        return DescriptionQuestionSerializer(question).data
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -156,7 +156,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         else:
             raise ValueError(schedule_serializer.errors)
 
-        location = Location.objects.get(address_2_code=validated_data['location'])
+        location = Location.objects.get(address_2_code=validated_data.get('location'))
 
         project = Project.objects.create(
             title=validated_data['title'],
@@ -164,7 +164,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             started_at=validated_data['started_at'],
             ends_at=validated_data['ends_at'],
             location=location,
-            schedule=schedule
+            schedule=schedule,
         )
         project.save()
 
@@ -172,23 +172,23 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         for description_data in descriptions_data:
             description = ProjectDescription(
                 project=project,
-                question=description_data['question'],
-                answer=description_data['answer']
+                question=description_data.get('question'),
+                answer=description_data.get('answer'),
             )
             description.save()
 
         for media_data_object in media_data:
             media = Media(
-                type=media_data_object['type'],
-                url=media_data_object['url']
+                type=media_data_object.get('type'),
+                url=media_data_object.get('url'),
             )
             media.save()
             project.media.add(media)
 
         for contact_data in contacts_data:
             contact = Contact(
-                type=contact_data['type'],
-                information=contact_data['information']
+                type=contact_data.get('type'),
+                information=contact_data.get('information'),
             )
             contact.save()
             project.contacts.add(contact)
