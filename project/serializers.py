@@ -195,19 +195,17 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
 
         for ability_string in abilities_data:
             ability, created = Ability.objects.get_or_create(name=ability_string)
+            new_count = ability.count + 1
+            ability.count = new_count
 
-            if not created:
-                new_count = ability.count + 1
-                ability.count = new_count
             ability.save()
             project.abilities.add(ability)
         
         for keyword_string in keywords_data:
             keyword, created = Keyword.objects.get_or_create(name=keyword_string)
+            new_count = keyword.count + 1
+            keyword.count = new_count
 
-            if not created:
-                new_count = keyword.count + 1
-                keyword.count = new_count
             keyword.save()
             project.keywords.add(keyword)
         
