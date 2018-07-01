@@ -4,11 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
 from project.models import (
-    Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription
+    Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription,
+    Media
 )
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
-    ProjectSaveSerializer, ProjectSerializer, ProjectDescriptionCreateSerializer
+    ProjectSaveSerializer, ProjectSerializer
 )
 
 class ScheduleRecurringTypeViewSet(APIView):
@@ -130,3 +131,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def patch_media(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))
+        media_data = request.data.get('media')
+        for media_data_object in media_data:
+            media_id = media_data_object.get('id')
+            if media_id:
+                media = get_object_or_404(Media, id=media_id)
+                media.type_id = media_data_object.get('type')
+                media.url = media_data_object.get('url')
+                media.save()
+            else:
+                media = Media(
+                    type_id=media_data_object.get('type'),
+                    url=media_data_object.get('url'),
+                )
+                media.save()
+                project.media.add(media)
+
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
