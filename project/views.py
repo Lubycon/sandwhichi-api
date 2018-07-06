@@ -111,21 +111,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
     def patch_descriptions(self, request, *args, **kwargs):
-        # id값 없는 애들 지워줘야함
         project = get_object_or_404(Project, id=kwargs.get('pk'))
         descriptions_data = request.data.get('descriptions')
+        ProjectDescription.objects.filter(project=project).delete()
         for description_data in descriptions_data:
-            description_id = description_data.get('id')
-            if description_id:
-                description = get_object_or_404(ProjectDescription, id=description_id)
-                description.question_id = description_data.get('question')
-                description.answer = description_data.get('answer')
-            else:
-                description = ProjectDescription(
-                    project=project,
-                    question_id=description_data.get('question'),
-                    answer=description_data.get('answer'),
-                )
+            description = ProjectDescription(
+                project=project,
+                question_id=description_data.get('question'),
+                answer=description_data.get('answer'),
+            )
             description.save()
 
         serializer = ProjectSerializer(project)
@@ -135,20 +129,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def patch_media(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))
         media_data = request.data.get('media')
+        project.medai.all().delete()
         for media_data_object in media_data:
-            media_id = media_data_object.get('id')
-            if media_id:
-                media = get_object_or_404(Media, id=media_id)
-                media.type_id = media_data_object.get('type')
-                media.url = media_data_object.get('url')
-                media.save()
-            else:
-                media = Media(
-                    type_id=media_data_object.get('type'),
-                    url=media_data_object.get('url'),
-                )
-                media.save()
-                project.media.add(media)
+            type_data = media_data_object.get('type')
+            url_data = media_data_object.get('url')
+            media = Media(
+                type_id=type_data,
+                url=url_data,
+            )
+            media.save()
+            project.media.add(media)
 
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -170,22 +160,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def patch_contacts(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))
         contacts_data = request.data.get('contacts')
+        project.contacts.all().delete()
         for contact_data in contacts_data:
-            contact_id = contact_data.get('id')
             type_data = contact_data.get('type')
             information_data = contact_data.get('information')
-            if contact_id:
-                contact = get_object_or_404(Contact, id=contact_id)
-                contact.type_id = type_data
-                contact.information = information_data
-                contact.save()
-            else:
-                contact = Contact(
-                    type_id=type_data,
-                    information=information_data,
-                )
-                contact.save()
-                project.contacts.add(contact)
+            contact = Contact(
+                type_id=type_data,
+                information=information_data,
+            )
+            contact.save()
+            project.contacts.add(contact)
 
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)

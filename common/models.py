@@ -8,7 +8,7 @@ class ContactType(SoftDeleteMixin, models.Model):
     updated_at = models.DateTimeField(auto_now=True, )
 
 
-class Contact(SoftDeleteMixin, models.Model):
+class Contact(models.Model):
     type = models.ForeignKey(ContactType, on_delete=models.PROTECT, )
     information = models.CharField(max_length=100, )
     created_at = models.DateTimeField(auto_now_add=True, )
@@ -21,7 +21,7 @@ class MediaType(SoftDeleteMixin, models.Model):
     updated_at = models.DateTimeField(auto_now=True, )
 
 
-class Media(SoftDeleteMixin, models.Model):
+class Media(models.Model):
     type = models.ForeignKey(MediaType, on_delete=models.PROTECT, )
     url = models.URLField(max_length=500, )
     created_at = models.DateTimeField(auto_now_add=True, )
