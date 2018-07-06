@@ -11,7 +11,7 @@ from project.models import (
 )
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
-    ProjectSaveSerializer, ProjectSerializer
+    ProjectSaveSerializer, ProjectSerializer, ScheduleSaveSerializer
 )
 
 class ScheduleRecurringTypeViewSet(APIView):
@@ -111,6 +111,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
     def patch_descriptions(self, request, *args, **kwargs):
+        # id값 없는 애들 지워줘야함
         project = get_object_or_404(Project, id=kwargs.get('pk'))
         descriptions_data = request.data.get('descriptions')
         for description_data in descriptions_data:
@@ -152,6 +153,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+    def patch_schedule(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        schedule_data = request.data.get('schedule')
+        schedule = project.schedule
+        project_serializer = ProjectSerializer(project)
+        schedule_serializer = ScheduleSaveSerializer(schedule, data=schedule_data)
+        if schedule_serializer.is_valid():
+            schedule_serializer.save()
+            return Response(project_serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(schedule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+        return Response({}, status=status.HTTP_200_OK)
 
     def add_ability(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))

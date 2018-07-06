@@ -22,7 +22,7 @@ class ScheduleRecurringTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', )
 
 
-class ScheduleCreateSerializer(serializers.ModelSerializer):
+class ScheduleSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = (
@@ -119,7 +119,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
     descriptions = ProjectDescriptionCreateSerializer(many=True, )
     media = MediaCreateSerializer(many=True, )
     contacts = ContactCreateSerializer(many=True, )
-    schedule = ScheduleCreateSerializer()
+    schedule = ScheduleSaveSerializer()
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())
     location_code = serializers.CharField(source='location')
@@ -150,7 +150,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         schedule_data = validated_data.pop('schedule')
 
         # One to One
-        schedule_serializer = ScheduleCreateSerializer(data=schedule_data)
+        schedule_serializer = ScheduleSaveSerializer(data=schedule_data)
         if schedule_serializer.is_valid():
             schedule = schedule_serializer.save()
         else:
