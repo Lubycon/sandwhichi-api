@@ -9,8 +9,8 @@ from common.models import (
 )
 from location.models import Location
 from common.serializers import (
-    ContactSerializer, ContactCreateSerializer,
-    MediaSerializer, MediaCreateSerializer,
+    ContactSerializer, ContactSaveSerializer,
+    MediaSerializer, MediaSaveSerializer,
     AbilitySerializer, KeywordSerializer
 )
 from location.serializers import LocationSerializer
@@ -66,7 +66,7 @@ class DescriptionQuestionSerializer(serializers.ModelSerializer):
         fields = ('id', 'content')
 
 
-class ProjectDescriptionCreateSerializer(serializers.ModelSerializer):
+class ProjectDescriptionSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectDescription
         fields = ('question', 'answer')
@@ -116,9 +116,9 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectSaveSerializer(serializers.ModelSerializer):
-    descriptions = ProjectDescriptionCreateSerializer(many=True, )
-    media = MediaCreateSerializer(many=True, )
-    contacts = ContactCreateSerializer(many=True, )
+    descriptions = ProjectDescriptionSaveSerializer(many=True, )
+    media = MediaSaveSerializer(many=True, )
+    contacts = ContactSaveSerializer(many=True, )
     schedule = ScheduleSaveSerializer()
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())

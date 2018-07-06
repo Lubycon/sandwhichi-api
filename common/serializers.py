@@ -16,7 +16,7 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = ('id', 'type', 'information')
 
 
-class ContactCreateSerializer(serializers.ModelSerializer):
+class ContactSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = ('type', 'information')
@@ -35,7 +35,7 @@ class MediaSerializer(serializers.ModelSerializer):
         fields = ('id', 'type', 'url')
 
 
-class MediaCreateSerializer(serializers.ModelSerializer):
+class MediaSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
         fields = ('type', 'url')

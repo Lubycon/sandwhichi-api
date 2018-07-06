@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
-from common.models import Ability, Keyword
+from common.models import Ability, Keyword, Contact
 from project.models import (
     Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription,
     Media
@@ -154,7 +154,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-    def patch_schedule(self, request, *args, **kwargs):
+    def patch_schedules(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))
         schedule_data = request.data.get('schedule')
         schedule = project.schedule
@@ -167,7 +167,29 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response(schedule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-        return Response({}, status=status.HTTP_200_OK)
+    def patch_contacts(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        contacts_data = request.data.get('contacts')
+        for contact_data in contacts_data:
+            contact_id = contact_data.get('id')
+            type_data = contact_data.get('type')
+            information_data = contact_data.get('information')
+            if contact_id:
+                contact = get_object_or_404(Contact, id=contact_id)
+                contact.type_id = type_data
+                contact.information = information_data
+                contact.save()
+            else:
+                contact = Contact(
+                    type_id=type_data,
+                    information=information_data,
+                )
+                contact.save()
+                project.contacts.add(contact)
+
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def add_ability(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))
