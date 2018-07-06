@@ -21,6 +21,10 @@ project_title_patch = project_views.ProjectViewSet.as_view({
     'patch': 'patch_title',
 })
 
+project_location_patch = project_views.ProjectViewSet.as_view({
+    'patch': 'patch_location',
+})
+
 project_descriptions_patch = project_views.ProjectViewSet.as_view({
     'patch': 'patch_descriptions',
 })
@@ -58,6 +62,7 @@ urlpatterns = [
     url(r'^projects/(?P<pk>[0-9]+)$', project_detail, name='project-detail'),
     url(r'^projects/(?P<pk>[0-9]+)/profile-image$', project_profile_image_patch, name='project-profile-image-patch'),
     url(r'^projects/(?P<pk>[0-9]+)/title$', project_title_patch, name='project-title-patch'),
+    url(r'^projects/(?P<pk>[0-9]+)/location', project_location_patch, name='project-location-patch'),
     url(r'^projects/(?P<pk>[0-9]+)/descriptions$', project_descriptions_patch, name='project-descriptions-patch'),
     url(r'^projects/(?P<pk>[0-9]+)/media$', project_media_patch, name='project-media-patch'),
     url(r'^projects/(?P<pk>[0-9]+)/schedules$', project_schedule_patch, name='project-schedule-patch'),

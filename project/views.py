@@ -9,6 +9,7 @@ from project.models import (
     Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription,
     Media
 )
+from location.models import Location
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
     ProjectSaveSerializer, ProjectSerializer, ScheduleSaveSerializer
@@ -77,6 +78,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
+        # 프로젝트를 되살려야 할 수도 있기 때문에 프로젝트 모델만 소프트 딜리트 한다
         project_object = get_object_or_404(Project, id=kwargs.get('pk'))
         project_object.delete()
 
@@ -99,11 +101,24 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def patch_title(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('pk'))
         new_title = request.data.get('title')
-
         if not new_title:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         project.title = new_title
+        project.save()
+
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def patch_location(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        new_location_code = request.data.get('location_code')
+        if not new_location_code:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        new_location = get_object_or_404(Location, address_1_code=new_location_code, address_2_code__isnull=True)
+        project.location = new_location
         project.save()
 
         serializer = ProjectSerializer(project)

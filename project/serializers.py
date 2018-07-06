@@ -156,7 +156,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         else:
             raise ValueError(schedule_serializer.errors)
 
-        location = Location.objects.get(address_2_code=validated_data.get('location'))
+        location = Location.objects.get(address_1_code=validated_data.get('location'), address_2_code__isnull=True)
 
         project = Project.objects.create(
             title=validated_data['title'],
