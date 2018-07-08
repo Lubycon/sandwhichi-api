@@ -7,7 +7,7 @@ update-requirements:
 	pip freeze > ./requirements.txt
 
 make-fixtures:
-	python3 manage.py loaddata location/fixtures/2018-04-01-locations.json
+	python3 manage.py loaddata location/fixtures/locations.json
 
 make-migrations:
 	python3 manage.py makemigrations
