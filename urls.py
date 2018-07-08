@@ -16,9 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
+from rest_framework_swagger.views import get_swagger_view
+schema_view = get_swagger_view(title='Sandwhichi API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^swagger$', schema_view),
     url(r'^', include('account.urls', namespace='account')),
     url(r'^', include('common.urls', namespace='common')),
     url(r'^', include('project.urls', namespace='project')),

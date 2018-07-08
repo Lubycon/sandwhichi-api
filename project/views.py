@@ -1,3 +1,4 @@
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
@@ -119,6 +120,21 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         new_location = get_object_or_404(Location, address_1_code=new_location_code, address_2_code__isnull=True)
         project.location = new_location
+        project.save()
+
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def patch_date(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        new_started_at = request.data.get('started_at')
+        new_ends_at = request.data.get('ends_at')
+        if not new_started_at or not new_ends_at:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        project.started_at = new_started_at
+        project.ends_at = new_ends_at
         project.save()
 
         serializer = ProjectSerializer(project)
