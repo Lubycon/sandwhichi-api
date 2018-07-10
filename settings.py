@@ -26,7 +26,7 @@ SECRET_KEY = '&mx%m)l0r)h+lm2en$1v7dp(!aic&2d82yjk!$h8_!o#p9bvp9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['local.sandwhichi.com']
+ALLOWED_HOSTS = ['local.sandwhichi.com:3000']
 
 # Application definition
 AUTH_USER_MODEL = 'user.User'
