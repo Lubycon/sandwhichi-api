@@ -14,7 +14,7 @@ location_third_list = location_views.LocationViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^locations$', location_first_list, name='location-first-list'),
-    url(r'^locations/(?P<address_0_code>[0-9]+)$', location_second_list, name='location-second-list'),
-    url(r'^locations/(?P<address_0_code>[0-9]+)/(?P<address_1_code>[0-9]+)$', location_third_list, name='location-third-list'),
+    url(r'^locations/$', location_first_list, name='location-first-list'),
+    url(r'^locations/(?P<address_0_code>[0-9]+)/$', location_second_list, name='location-second-list'),
+    url(r'^locations/(?P<address_0_code>[0-9]+)/(?P<address_1_code>[0-9]+)/$', location_third_list, name='location-third-list'),
 ]
