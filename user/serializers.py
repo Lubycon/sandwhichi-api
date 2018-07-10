@@ -19,12 +19,12 @@ class SignupUserSerializer(serializers.ModelSerializer):
 
     def validate_has_terms(self, has_terms):
         if has_terms != True:
-            raise serializers.ValidationError("이용 약관에 동의해주세요")
+            raise serializers.ValidationError()
         return has_terms
     
     def validate_has_privacy_policy(self, has_privacy_policy):
         if has_privacy_policy != True:
-            raise serializers.ValidationError("개인정보보호정책에 동의해주세요")
+            raise serializers.ValidationError()
         return has_privacy_policy
 
     def create(self, validated_data):
@@ -35,7 +35,7 @@ class SignupUserSerializer(serializers.ModelSerializer):
 class SigninUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        field = ('email', 'password', )
+        fields = ('email', 'password', )
 
     def validate_email(self, value):
         """
