@@ -26,7 +26,7 @@ SECRET_KEY = '&mx%m)l0r)h+lm2en$1v7dp(!aic&2d82yjk!$h8_!o#p9bvp9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['local.sandwhichi.com:3000']
+ALLOWED_HOSTS = ['local.sandwhichi.com']
 
 # Application definition
 AUTH_USER_MODEL = 'user.User'
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_swagger',
+    'corsheaders',
 
     'account.apps.AccountConfig',
     'common.apps.CommonConfig',
@@ -55,7 +56,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = ('local.sandwhichi.com:3000', )
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
