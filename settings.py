@@ -58,6 +58,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+
+    'base.middlewares.APIResponseMiddleWare',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = False
