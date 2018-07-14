@@ -10,5 +10,11 @@ class BaseCustomException(Exception):
     def to_dict(self):
         return { 'message': self.error_message }
 
+class InternalServerError(BaseCustomException):
+    status_code = 500
+
 class BadRequest(BaseCustomException):
     status_code = 400
+
+class BadFileRequest(BaseCustomException):
+    status_code = 422
