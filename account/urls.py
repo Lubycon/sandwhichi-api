@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^auth/signup/$', account_views.Signup.as_view()),
     url(r'^auth/token/refresh/$', refresh_jwt_token),
     url(r'^auth/token/verify/$', verify_jwt_token),
+    url(r'^auth/password/verify/$', account_views.PasswordViewSet.as_view()),
 ]

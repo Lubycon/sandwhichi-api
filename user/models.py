@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin):
     REQUIRED_FIELDS = ['username', 'has_terms', 'has_privacy_policy', ]
 
     def __str__(self):
-        return 'id: %s, email: %s, username: %s' % (self.pk, self.email, self.username)
+        return '<User %s> [email: %s] [username: %s]' % (self.pk, self.email, self.username)
 
     def get_full_name(self):        
         return self.username

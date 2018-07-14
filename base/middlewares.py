@@ -4,7 +4,7 @@ from django.http import JsonResponse
 def is_registered(exception):
     try:
         return exception.is_error_response
-    except AttributeError:
+    except AttributeError as e:
         return False
 
 class APIResponseMiddleWare(object):
@@ -17,7 +17,6 @@ class APIResponseMiddleWare(object):
 
     def __call__(self, request):
         response = self.get_response(request)
-        print(response)
         if (isinstance(response, Response)):
             data = response.data
             response.data = {
@@ -32,6 +31,9 @@ class APIResponseMiddleWare(object):
             status = exception.status_code
             exception_dict = exception.to_dict()
         else:
+            # @TODO 에러 트래킹 추가
+            import traceback
+            print(traceback.format_exc())
             status = 500
             exception_dict = { 'message': '알 수 없는 서버 장애입니다. 문제가 계속 될 경우 고객센터로 문의해주세요!' }
 
