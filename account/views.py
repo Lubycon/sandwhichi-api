@@ -68,3 +68,5 @@ class PasswordViewSet(APIView):
             raise BadRequest('비밀번호가 일치하지 않습니다. 다시 한번 확인해주세요')
 
         return Response({}, status=status.HTTP_200_OK)
+
+

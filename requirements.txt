@@ -1,4 +1,5 @@
 astroid==1.6.5
+boto==2.49.0
 boto3==1.7.58
 botocore==1.10.58
 certifi==2018.4.16
@@ -8,9 +9,11 @@ coreschema==0.0.4
 Django==2.0.6
 django-cors-headers==2.3.0
 django-rest-swagger==2.2.0
+django-ses==0.8.5
 djangorestframework==3.8.2
 djangorestframework-jwt==1.11.0
 docutils==0.14
+future==0.16.0
 idna==2.7
 isort==4.3.4
 itypes==1.1.0

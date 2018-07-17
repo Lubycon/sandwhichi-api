@@ -39,10 +39,10 @@ class ImageViewSet(APIView):
             raise BadFileRequest('파일이 너무 큽니다. 파일은 %s byte 이하여야 합니다.' % (self.max_image_size))
 
         s3 = boto3.resource('s3',
-                            region_name=settings.SANDWHICHI_RAW_IMAGE_BUCKET_REGION_NAME,
-                            aws_access_key_id=settings.SANDWHICHI_RAW_IMAGE_AWS_ACCESS_KEY_ID,
-                            aws_secret_access_key=settings.SANDWHICHI_RAW_IMAGE_AWS_SECRET_ACCESS_KEY)
-        bucket_name = settings.SANDWHICHI_RAW_IMAGE_BUCKET_NAME
+                            region_name=settings.RAW_IMAGE_BUCKET_REGION_NAME,
+                            aws_access_key_id=settings.RAW_IMAGE_AWS_ACCESS_KEY_ID,
+                            aws_secret_access_key=settings.RAW_IMAGE_AWS_SECRET_ACCESS_KEY)
+        bucket_name = settings.RAW_IMAGE_BUCKET_NAME
 
         try:
             image_file = Image.open(request_image)
@@ -64,7 +64,7 @@ class ImageViewSet(APIView):
         if image_file:
             # Tag this file_name with an expiry time
             file_name = "%s-%s" % (uuid.uuid4(), datetime.datetime.now().strftime("%Y%m%d%H"))
-            image_url = "%s%s" % (settings.SANDWHICHI_RAW_IMAGE_BUCKET_BASE_URL, file_name)
+            image_url = "%s%s" % (settings.RAW_IMAGE_BUCKET_BASE_URL, file_name)
             s3_object = s3.Object(bucket_name, file_name)
 
             # try:
