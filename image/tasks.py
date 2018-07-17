@@ -7,8 +7,8 @@ import json
 
 s3 = boto3.resource('s3',
                     region_name=settings.RAW_IMAGE_BUCKET_REGION_NAME,
-                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+                    aws_access_key_id=settings.AWS_S3_ACCESS_KEY_ID,
+                    aws_secret_access_key=settings.AWS_S3_SECRET_ACCESS_KEY)
 raw_bucket_name = settings.RAW_IMAGE_BUCKET_NAME
 service_bucket_name = 'sandwhichi-dev'
 

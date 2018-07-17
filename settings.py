@@ -93,16 +93,17 @@ SWAGGER_SETTINGS = {
     'JSON_EDITOR': True,
 }
 
-AWS_ACCESS_KEY_ID = 'AKIAJUPFBBGVTYQIVGHA'
-AWS_SECRET_ACCESS_KEY = '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'
-
+AWS_S3_ACCESS_KEY_ID = 'AKIAJUPFBBGVTYQIVGHA'
+AWS_S3_SECRET_ACCESS_KEY = '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'
 RAW_IMAGE_BUCKET_BASE_URL = 'https://sandwhichi-dev-raw-image.s3.ap-northeast-2.amazonaws.com/'
 RAW_IMAGE_BUCKET_NAME = 'sandwhichi-dev-raw-image'
 RAW_IMAGE_BUCKET_REGION_NAME = 'ap-northeast-2'
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_SES_REGION_NAME = 'us-west-2'
-AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+AWS_SES_ACCESS_KEY_ID = 'AKIAI3TWYMRG4V44NAUQ'
+AWS_SES_SECRET_ACCESS_KEY = 'Ah5dAsyg9+Db9x8g+oeLOMnSS22EcehHanImWJ/vKuSc'
+AWS_SES_REGION_NAME = 'us-east-1'
+AWS_SES_REGION_ENDPOINT = 'email-smtp.us-east-1.amazonaws.com'
 
 ROOT_URLCONF = 'urls'
 
