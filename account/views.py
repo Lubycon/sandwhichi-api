@@ -59,7 +59,6 @@ class PasswordViewSet(APIView):
     def post(self, request, format='json'):
         user = request.user
         requested_password = request.data.get('password')
-        print(user, requested_password)
         if not requested_password:
             raise BadRequest('비밀번호가 입력해주세요.')
 
@@ -68,5 +67,17 @@ class PasswordViewSet(APIView):
             raise BadRequest('비밀번호가 일치하지 않습니다. 다시 한번 확인해주세요')
 
         return Response({}, status=status.HTTP_200_OK)
+
+
+class EMailCertificationViewSet(APIView):
+    """
+    이메일 인증 API
+    """
+    permission_classes = (IsAuthenticated, )
+    def post(self, request, format='json'):
+        user = request.user
+        email = user.email
+        email = 'bboydart91@gmail.com' #test
+
 
 

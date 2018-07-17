@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import datetime
+APPLICATION_ENV = os.environ.get("APPLICATION_ENV", 'local')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,17 +94,23 @@ SWAGGER_SETTINGS = {
     'JSON_EDITOR': True,
 }
 
+# S3 bucket settings
 AWS_S3_ACCESS_KEY_ID = 'AKIAJUPFBBGVTYQIVGHA'
 AWS_S3_SECRET_ACCESS_KEY = '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'
 RAW_IMAGE_BUCKET_BASE_URL = 'https://sandwhichi-dev-raw-image.s3.ap-northeast-2.amazonaws.com/'
 RAW_IMAGE_BUCKET_NAME = 'sandwhichi-dev-raw-image'
 RAW_IMAGE_BUCKET_REGION_NAME = 'ap-northeast-2'
 
+# Email settings
 EMAIL_BACKEND = 'django_ses.SESBackend'
 AWS_SES_ACCESS_KEY_ID = 'AKIAI3TWYMRG4V44NAUQ'
 AWS_SES_SECRET_ACCESS_KEY = 'Ah5dAsyg9+Db9x8g+oeLOMnSS22EcehHanImWJ/vKuSc'
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email-smtp.us-east-1.amazonaws.com'
+SERVER_EMAIL = "루비콘 <support@sandwhichi.com>"
+DEFAULT_FROM_EMAIL = SERVER_EMAIL
+EMAIL_SEND_USER = '루비콘 <noreply@sandwhichi.com>'
+EMAIL_SUBJECT_PREFIX = '[Sandwhichi %s]' % APPLICATION_ENV
 
 ROOT_URLCONF = 'urls'
 
