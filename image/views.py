@@ -1,4 +1,5 @@
-from rest_framework import viewsets, status
+from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework.throttling import UserRateThrottle
@@ -16,7 +17,7 @@ from PIL import Image
 import json
 
 
-class ImageViewSet(viewsets.ViewSet):
+class ImageViewSet(APIView):
     # DRF settings
     throttle_classes = (UserRateThrottle,)
     parser_classes = (MultiPartParser,)
@@ -26,7 +27,7 @@ class ImageViewSet(viewsets.ViewSet):
     max_image_size = 3145728  # byte
     image_size = (100, 360, 720, 1920)
 
-    def create(self, request):
+    def post(self, request):
         if 'image' not in request.FILES:
             raise BadFileRequest('파일이 없습니다.')
 
