@@ -6,6 +6,7 @@ from base.handlers.jwt import get_jwt, jwt_response_payload_handler
 from base.exceptions import BadRequest
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
 class Signup(APIView):
@@ -60,7 +61,6 @@ class PasswordViewSet(APIView):
     def post(self, request, format='json'):
         user = request.user
         requested_password = request.data.get('password')
-        print(user, requested_password)
         if not requested_password:
             raise BadRequest('비밀번호를 입력해주세요.')
 
@@ -70,4 +70,49 @@ class PasswordViewSet(APIView):
 
         return Response({}, status=status.HTTP_200_OK)
 
+
+class PasswordChangeTokenViewSet(APIView):
+    """
+    비밀번호 변경 토큰 검증 API
+    """
+    permission_classes = (IsAuthenticated, )
+    def post(self, request, format='json'):
+        user = request.user
+        token = request.data.get('token')
+        if not token:
+            raise BadRequest('이메일로 발송되었던 토큰을 입력해주세요')
+
+        is_valid = PasswordResetTokenGenerator().check_token(user, token)
+        if not is_valid:
+            raise BadRequest('올바르지 않은 토큰입니다. 비밀번호 변경 이메일을 재발송 해주세요.')
+
+        data = {
+            'token': token
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class PasswordChangeViewSet(APIView):
+    """
+    비밀번호 변경 API
+    """
+    permission_classes = (IsAuthenticated, )
+    def put(self, request, format='json'):
+        user = request.user
+        token = request.data.get('token')
+        new_password = request.data.get('password')
+
+        if not token:
+            raise BadRequest('이메일로 발송되었던 토큰을 입력해주세요')
+
+        is_token_valid = PasswordResetTokenGenerator().check_token(user, token)
+
+        if not is_token_valid:
+            raise BadRequest('올바르지 않은 토큰입니다. 비밀번호 변경 이메일을 재발송 해주세요.')
+        elif not new_password:
+            raise BadRequest('새로 등록하실 비밀번호를 입력해주세요')
+
+        user.set_password(new_password)
+        user.save()
+        return Response({}, status=status.HTTP_200_OK)
 
