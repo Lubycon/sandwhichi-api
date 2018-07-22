@@ -7,6 +7,7 @@ from base.exceptions import BadRequest
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.permissions import IsAuthenticated
 
+
 class Signup(APIView):
     """
     유저 생성 API
@@ -61,7 +62,7 @@ class PasswordViewSet(APIView):
         requested_password = request.data.get('password')
         print(user, requested_password)
         if not requested_password:
-            raise BadRequest('비밀번호가 입력해주세요.')
+            raise BadRequest('비밀번호를 입력해주세요.')
 
         is_valid = user.check_password(requested_password)
         if not is_valid:

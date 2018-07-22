@@ -14,8 +14,7 @@ import os
 import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -88,6 +87,7 @@ JWT_AUTH = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
+PASSWORD_RESET_TIMEOUT_DAYS = 1
 
 SWAGGER_SETTINGS = {
     'JSON_EDITOR': True,
@@ -99,18 +99,21 @@ RAW_IMAGE_BUCKET_BASE_URL = 'https://sandwhichi-dev-raw-image.s3.ap-northeast-2.
 RAW_IMAGE_BUCKET_NAME = 'sandwhichi-dev-raw-image'
 RAW_IMAGE_BUCKET_REGION_NAME = 'ap-northeast-2'
 
-EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_SES_ACCESS_KEY_ID = 'AKIAI3TWYMRG4V44NAUQ'
-AWS_SES_SECRET_ACCESS_KEY = 'Ah5dAsyg9+Db9x8g+oeLOMnSS22EcehHanImWJ/vKuSc'
-AWS_SES_REGION_NAME = 'us-east-1'
-AWS_SES_REGION_ENDPOINT = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'AKIAI3TWYMRG4V44NAUQ' # AWS_SES_ACCESS_KEY_ID
+EMAIL_HOST_PASSWORD = 'Ah5dAsyg9+Db9x8g+oeLOMnSS22EcehHanImWJ/vKuSc' # AWS_SES_SECRET_ACCESS_KEY
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Sandwhichi <noreply@sandwhichi.com>'
+EMAIL_SUBJECT_PREFIX = '[Sandwhichi]'
 
 ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
