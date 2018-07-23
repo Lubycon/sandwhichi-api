@@ -31,7 +31,39 @@ class PasswordChange(APIView):
         )
 
         result_data = {
-            'email': email_result
+            'email': email_result,
+        }
+
+        return Response(result_data, status=status.HTTP_200_OK)
+
+
+class EmailCertification(APIView):
+    """
+    이메일 주소 인증 이메일 발송
+    """
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user
+        user_email = user.email
+        template_path = 'email/email_certification/email_certification'
+
+        token = PasswordResetTokenGenerator().make_token(user)
+        redirect_url = '/auth/%s' % (token)
+
+        context = {
+            'username': user.username,
+            'redirect_url': redirect_url,
+        }
+
+        email_result = email_helper.email_send(
+            request,
+            to_address=user_email,
+            template_path=template_path,
+            context=context
+        )
+
+        result_data = {
+            'email': email_result,
         }
 
         return Response(result_data, status=status.HTTP_200_OK)
