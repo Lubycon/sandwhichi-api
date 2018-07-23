@@ -1,3 +1,4 @@
+import settings
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import (
@@ -5,6 +6,8 @@ from django.contrib.auth.models import (
 )
 from .managers import UserManager
 from base.mixins.soft_delete import SoftDeleteMixin
+from common.models import Ability, Keyword
+
 
 class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin):
     # _()은 i18n 될 수 있는 함수를 의미
@@ -34,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin):
     def get_short_name(self):
         return self.username
 
-    def email_user(self, subject, message, from_email=None):
+    def email_user(self, subject, message, from_email=settings.DEFAULT_FROM_EMAIL):
         send_mail(subject, message, from_email, [self.email])
         
     def save(self, *args, **kwargs):
@@ -48,5 +51,9 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin):
 
 class UserProfile(SoftDeleteMixin, models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE, primary_key=True, )
+    profile_image = models.URLField(max_length=500, null=True, )
+    abilities = models.ManyToManyField(Ability)
+    keywords = models.ManyToManyField(Keyword)
+    is_certified_email = models.BooleanField(default=False, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
