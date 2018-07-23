@@ -116,3 +116,27 @@ class PasswordChangeViewSet(APIView):
         user.save()
         return Response({}, status=status.HTTP_200_OK)
 
+
+class EmailCertificationTokenViewSet(APIView):
+    """
+    이메일 인증 토큰 검증 API
+    """
+    permission_classes = (IsAuthenticated, )
+    def post(self, request, format='json'):
+        user = request.user
+        token = request.data.get('token')
+        if not token:
+            raise BadRequest('이메일로 발송되었던 토큰을 입력해주세요')
+
+        is_valid = PasswordResetTokenGenerator().check_token(user, token)
+        if not is_valid:
+            raise BadRequest('올바르지 않은 토큰입니다. 이메일 인증 이메일을 재발송 해주세요.')
+
+        user.profile.is_certified_email = is_valid
+        user.save()
+        
+        data = {
+            'token': token
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
