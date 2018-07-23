@@ -45,3 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin):
         "Is the user a member of staff?"
         return self.is_admin
 
+
+class UserProfile(SoftDeleteMixin, models.Model):
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE, primary_key=True, )
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
