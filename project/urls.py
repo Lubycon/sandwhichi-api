@@ -61,6 +61,14 @@ project_keyword = project_views.ProjectViewSet.as_view({
     'delete': 'remove_keyword',
 })
 
+project_members = project_views.ProjectMemberViewSet.as_view({
+    'post': 'add_member',
+})
+
+project_member = project_views.ProjectMemberViewSet.as_view({
+    'delete': 'delete_member',
+})
+
 urlpatterns = [
     url(r'^projects/$', project_list, name='project-list'),
     url(r'^projects/(?P<pk>[0-9]+)/$', project_detail, name='project-detail'),
@@ -72,10 +80,16 @@ urlpatterns = [
     url(r'^projects/(?P<pk>[0-9]+)/media/$', project_media_patch, name='project-media-patch'),
     url(r'^projects/(?P<pk>[0-9]+)/schedules/$', project_schedule_patch, name='project-schedule-patch'),
     url(r'^projects/(?P<pk>[0-9]+)/contacts/$', project_contact_patch, name='project-contact-patch'),
+
     url(r'^projects/(?P<pk>[0-9]+)/abilities/$', project_abilities, name='project-abilities'),
     url(r'^projects/(?P<pk>[0-9]+)/abilities/(?P<ability_id>[0-9]+)/$', project_ability, name='project-ability'),
+
     url(r'^projects/(?P<pk>[0-9]+)/keywords/$', project_keywords, name='project-keywords'),
     url(r'^projects/(?P<pk>[0-9]+)/keywords/(?P<keyword_id>[0-9]+)/$', project_keyword, name='project-keyword'),
+
+    url(r'^projects/(?P<pk>[0-9]+)/members/$', project_members, name='project-members'),
+    url(r'^projects/(?P<pk>[0-9]+)/members/(?P<member_id>[0-9]+)/$', project_member, name='project_member'),
+
     url(r'^projects/questions/$', project_views.DescriptionQuestionViewSet.as_view(), name='project-question-list'),
     url(r'^schedules/recurringtypes/$', project_views.ScheduleRecurringTypeViewSet.as_view(), name='schedule-recurring-list'),
 ]
