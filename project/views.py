@@ -13,7 +13,7 @@ from project.models import (
 from location.models import Location
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
-    ProjectSaveSerializer, ProjectSerializer, ScheduleSaveSerializer
+    ProjectSaveSerializer, ProjectSerializer, ProjectScheduleSaveSerializer
 )
 from base.mixins.permission_classes_by_action import PermissionClassesByAction
 
@@ -186,7 +186,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
         schedule_data = request.data.get('schedule')
         schedule = project.schedule
         project_serializer = ProjectSerializer(project)
-        schedule_serializer = ScheduleSaveSerializer(schedule, data=schedule_data)
+        schedule_serializer = ProjectScheduleSaveSerializer(schedule, data=schedule_data)
         if schedule_serializer.is_valid():
             schedule_serializer.save()
             return Response(project_serializer.data, status=status.HTTP_200_OK)
