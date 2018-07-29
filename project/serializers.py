@@ -3,6 +3,7 @@ from django.db import transaction
 from project.models import (
     Project, DescriptionQuestion,
     ProjectDescription, ScheduleRecurringType, Schedule,
+    ProjectMember
 )
 from common.models import (
     Ability, Keyword, Contact, Media,
@@ -13,6 +14,7 @@ from common.serializers import (
     MediaSerializer, MediaSaveSerializer,
     AbilitySerializer, KeywordSerializer
 )
+from user.serializers import UserSimpleSerializer
 from location.serializers import LocationSerializer
 
 
@@ -84,8 +86,18 @@ class ProjectDescriptionSerializer(serializers.ModelSerializer):
         return DescriptionQuestionSerializer(question).data
 
 
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    role = serializers.CharField()
+    user = UserSimpleSerializer()
+
+    class Meta:
+        model = ProjectMember
+        fields = ('role', 'user', )
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     descriptions = serializers.SerializerMethodField()
+    members = serializers.SerializerMethodField()
     media = MediaSerializer(many=True, )
     contacts = ContactSerializer(many=True, )
     abilities = AbilitySerializer(many=True, )
@@ -108,11 +120,16 @@ class ProjectSerializer(serializers.ModelSerializer):
             'keywords',
             'schedule',
             'location',
+            'members',
         )
     
     def get_descriptions(self, obj):
         descriptions = ProjectDescription.objects.filter(project=obj.id)
         return ProjectDescriptionSerializer(descriptions, many=True).data
+
+    def get_members(self, obj):
+        members = ProjectMember.objects.filter(project=obj.id, is_active=True, )
+        return ProjectMemberSerializer(members, many=True).data
 
 
 class ProjectSaveSerializer(serializers.ModelSerializer):
@@ -140,6 +157,12 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             'location_code',
         )
 
+    def __init__(self, http_request=None, *args, **kwargs):
+        self.http_request = http_request
+
+        # Instantiate the superclass normally
+        super(ProjectSaveSerializer, self).__init__(*args, **kwargs)
+
     @transaction.atomic
     def create(self, validated_data):
         descriptions_data = validated_data.pop('descriptions')
@@ -148,6 +171,8 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         media_data = validated_data.pop('media')
         contacts_data = validated_data.pop('contacts')
         schedule_data = validated_data.pop('schedule')
+
+        user = self.http_request.user
 
         # One to One
         schedule_serializer = ScheduleSaveSerializer(data=schedule_data)
@@ -210,7 +235,13 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             project.keywords.add(keyword)
         
         project.save()
+
+        # Set project admin
+        project_admin = ProjectMember(
+            project=project,
+            user=user,
+            role='admin'
+        )
+        project_admin.save()
+
         return project
-
-
-    

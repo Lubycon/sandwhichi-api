@@ -1,4 +1,4 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
@@ -7,14 +7,15 @@ from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
 from common.models import Ability, Keyword, Contact
 from project.models import (
-    Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription,
-    Media
+    Project, ProjectMember, ScheduleRecurringType,
+    DescriptionQuestion, ProjectDescription, Media
 )
 from location.models import Location
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
     ProjectSaveSerializer, ProjectSerializer, ScheduleSaveSerializer
 )
+from base.mixins.permission_classes_by_action import PermissionClassesByAction
 
 class ScheduleRecurringTypeViewSet(APIView):
     """
@@ -38,7 +39,7 @@ class DescriptionQuestionViewSet(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
     """
     프로젝트 생성, 리스트, 뷰, 삭제, 패치 API
     """
@@ -46,9 +47,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     filter_backends = (OrderingFilter,)
     ordering = '-created_at'
+    permission_classes_by_action = {
+        'list': [AllowAny],
+        'retrieve': [AllowAny],
+        'default': [IsAuthenticated],
+    }
 
     def create(self, request, *args, **kwargs):
-        serializer = ProjectSaveSerializer(data=request.data)
+        serializer = ProjectSaveSerializer(request, data=request.data)
 
         if serializer.is_valid():
             project = serializer.save()

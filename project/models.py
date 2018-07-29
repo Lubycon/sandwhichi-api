@@ -72,5 +72,6 @@ class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.PROTECT, )
     user = models.ForeignKey(User, on_delete=models.CASCADE, )
     role = models.CharField(max_length=20, )
+    is_active = models.BooleanField(default=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
