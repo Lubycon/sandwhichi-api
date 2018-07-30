@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from project.models import (
     Project, DescriptionQuestion,
     ProjectDescription, ScheduleRecurringType, ProjectSchedule,
-    ProjectMember
+    ProjectMember, ProjectMemberRequest
 )
 from common.models import (
     Ability, Keyword, Contact, Media,
@@ -93,11 +93,11 @@ class ProjectMemberSaveSerializer(serializers.ModelSerializer):
         fields = ('user', 'project', )
 
     def validate(self, data):
-        project = data['project']
-        new_member = data['user']
+        project = data.get('project')
+        new_member = data.get('user')
         try:
             ProjectMember.objects.get(project=project, user=new_member, )
-            raise serializers.ValidationError({ 'already_exist_user': ['이미 해당 프로젝트에 존재하는 유저 입니다'] })
+            raise serializers.ValidationError({ 'already_exist_user': '이미 해당 프로젝트에 존재하는 유저 입니다' })
         except ObjectDoesNotExist:
             return data
 
@@ -121,6 +121,29 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectMember
         fields = ('role', 'user', )
+
+
+class ProjectMemberRequestSaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectMemberRequest
+        fields = ('project', 'user', )
+
+    def validate(self, data):
+        # TODO 이미 참여되어있는 프로젝트에는 참여신청 못하도록 막아야함
+        project = data.get('project')
+        user = data.get('user')
+
+        try:
+            ProjectMemberRequest.objects.get(project=project, user=user, )
+            raise serializers.ValidationError({ 'already_exist_request': '이미 해당 프로젝트에 참여 신청을 하셨습니다' })
+        except ObjectDoesNotExist:
+            return data
+
+
+class ProjectMemberRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectMemberRequest
+        fields = ('project', 'user', 'created_at', )
 
 
 class ProjectSerializer(serializers.ModelSerializer):

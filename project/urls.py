@@ -67,6 +67,11 @@ project_members = project_views.ProjectMemberViewSet.as_view({
 
 project_member = project_views.ProjectMemberViewSet.as_view({
     'delete': 'delete_member',
+    'patch': 'patch_role',
+})
+
+project_requests = project_views.ProjectMemberRequestViewSet.as_view({
+    'post': 'create',
 })
 
 urlpatterns = [
@@ -89,6 +94,8 @@ urlpatterns = [
 
     url(r'^projects/(?P<project_id>[0-9]+)/members/$', project_members, name='project_member'),
     url(r'^projects/(?P<project_id>[0-9]+)/members/(?P<user_id>[0-9]+)/$', project_member, name='project_member'),
+
+    url(r'^projects/(?P<project_id>[0-9]+)/requests/$', project_requests, name='project_requests'),
 
     url(r'^projects/questions/$', project_views.DescriptionQuestionViewSet.as_view(), name='project-question-list'),
     url(r'^schedules/recurringtypes/$', project_views.ScheduleRecurringTypeViewSet.as_view(), name='schedule-recurring-list'),

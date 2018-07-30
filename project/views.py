@@ -9,14 +9,16 @@ from base.exceptions import Conflict
 from common.models import Ability, Keyword, Contact
 from project.models import (
     Project, ScheduleRecurringType,
-    DescriptionQuestion, ProjectDescription, Media
+    DescriptionQuestion, ProjectDescription, Media,
+    ProjectMember
 )
 from location.models import Location
 from user.models import User
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
     ProjectSaveSerializer, ProjectSerializer, ProjectScheduleSaveSerializer,
-    ProjectMemberSaveSerializer, ProjectMemberSerializer
+    ProjectMemberSaveSerializer, ProjectMemberSerializer,
+    ProjectMemberRequestSaveSerializer
 )
 from base.mixins.custom_permissions import (
     PermissionClassesByAction, IsProjectOwner,
@@ -280,7 +282,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 class ProjectMemberViewSet(viewsets.ViewSet):
     """
-    프로젝트 멤버 리스트, 신청, 승인, 삭제, 패치 API
+    프로젝트 멤버 리스트, 승인, 삭제, 패치 API
     """
     permission_classes = (IsProjectOwner, )
 
@@ -299,9 +301,8 @@ class ProjectMemberViewSet(viewsets.ViewSet):
 
             return Response(project_member_serializer.data, status=status.HTTP_201_CREATED)
         elif serializer.errors.get('already_exist_user'):
-            raise Conflict(serializer.errors.get('already_exist_user')[0])
+            raise Conflict(serializer.errors.get('already_exist_user'))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
     def delete_member(self, request, *args, **kwargs):
@@ -309,8 +310,31 @@ class ProjectMemberViewSet(viewsets.ViewSet):
 
 
     def patch_role(self, request, *args, **kwargs):
-        pass
+        project_id = kwargs.get('project_id')
+        user_id = kwargs.get('user_id')
+        new_role = request.data.get('role')
+        project_member = get_object_or_404(ProjectMember, project=project_id, user=user_id, )
 
 
-    def accept(self, request, *args, **kwargs):
-        pass
+class ProjectMemberRequestViewSet(viewsets.ViewSet):
+    """
+    프로젝트 멤버 신청, 철회 API
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def create(self, request, *args, **kwargs):
+        project_id = kwargs.get('project_id')
+        user = request.user
+        data = {
+            'project': project_id,
+            'user': user.id,
+        }
+        serializer = ProjectMemberRequestSaveSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({}, status=status.HTTP_201_CREATED, )
+        elif serializer.errors.get('already_exist_request'):
+            raise Conflict(serializer.errors.get('already_exist_request'))
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST, )
