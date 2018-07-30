@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from user.models import User
+from user.models import User, UserProfile
 
 class SignupUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, min_length=2, max_length=30)
@@ -50,4 +50,37 @@ class SigninUserSerializer(serializers.ModelSerializer):
 
         return email
 
-    
+
+class MyUserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('profile_image', 'abilities', 'keywords', 'is_certified_email', )
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('profile_image', 'abilities', 'keywords', )
+
+
+class MyUserSimpleSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    username = serializers.CharField()
+    profile_image = serializers.URLField()
+    profile = MyUserProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'profile',)
+
+
+class UserSimpleSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    username = serializers.CharField()
+    profile = UserProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'profile', )
+
+

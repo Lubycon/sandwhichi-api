@@ -1,4 +1,4 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
@@ -7,13 +7,17 @@ from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
 from common.models import Ability, Keyword, Contact
 from project.models import (
-    Project, ScheduleRecurringType, DescriptionQuestion, ProjectDescription,
-    Media
+    Project, ProjectMember, ScheduleRecurringType,
+    DescriptionQuestion, ProjectDescription, Media
 )
 from location.models import Location
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
-    ProjectSaveSerializer, ProjectSerializer, ScheduleSaveSerializer
+    ProjectSaveSerializer, ProjectSerializer, ProjectScheduleSaveSerializer,
+    ProjectMemberSerializer
+)
+from base.mixins.custom_permissions import (
+    PermissionClassesByAction, IsProjectOwner,
 )
 
 class ScheduleRecurringTypeViewSet(APIView):
@@ -38,17 +42,23 @@ class DescriptionQuestionViewSet(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
     """
     프로젝트 생성, 리스트, 뷰, 삭제, 패치 API
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    filter_backends = (OrderingFilter,)
+    filter_backends = (OrderingFilter, )
     ordering = '-created_at'
+    permission_classes_by_action = {
+        'list': [AllowAny],
+        'retrieve': [AllowAny],
+        'default': [IsAuthenticated],
+    }
+
 
     def create(self, request, *args, **kwargs):
-        serializer = ProjectSaveSerializer(data=request.data)
+        serializer = ProjectSaveSerializer(request, data=request.data)
 
         if serializer.is_valid():
             project = serializer.save()
@@ -180,7 +190,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         schedule_data = request.data.get('schedule')
         schedule = project.schedule
         project_serializer = ProjectSerializer(project)
-        schedule_serializer = ScheduleSaveSerializer(schedule, data=schedule_data)
+        schedule_serializer = ProjectScheduleSaveSerializer(schedule, data=schedule_data)
         if schedule_serializer.is_valid():
             schedule_serializer.save()
             return Response(project_serializer.data, status=status.HTTP_200_OK)
@@ -265,3 +275,30 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class ProjectMemberViewSet(viewsets.ViewSet):
+    """
+    프로젝트 멤버 리스트, 신청, 승인, 삭제, 패치 API
+    """
+    permission_classes = (IsProjectOwner, )
+
+    def add_member(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        is_owner = self.check_object_permissions(request, project)
+
+        if not is_owner:
+            # Exception 걸 것
+            pass
+        me = request.user
+
+
+    def delete_member(self, request, *args, **kwargs):
+        pass
+
+
+    def patch_role(self, request, *args, **kwargs):
+        pass
+
+
+    def accept(self, request, *args, **kwargs):
+        pass

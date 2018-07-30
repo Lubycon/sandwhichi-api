@@ -14,22 +14,6 @@ class ScheduleRecurringType(SoftDeleteMixin, models.Model):
     updated_at = models.DateTimeField(auto_now=True, )
 
 
-class Schedule(SoftDeleteMixin, models.Model):
-    monday = models.BooleanField(default=False, )
-    tuesday = models.BooleanField(default=False, )
-    wednesday = models.BooleanField(default=False, )
-    thursday = models.BooleanField(default=False, )
-    friday = models.BooleanField(default=False, )
-    saturday = models.BooleanField(default=False, )
-    sunday = models.BooleanField(default=False, )
-    is_negotiable = models.BooleanField(default=False, )
-    recurring_type = models.ForeignKey(ScheduleRecurringType, on_delete=models.PROTECT, default=1, )
-    start_time = models.TimeField(default=datetime.time(00, 00), )
-    end_time = models.TimeField(default=datetime.time(00, 00), )
-    created_at = models.DateTimeField(auto_now_add=True, )
-    updated_at = models.DateTimeField(auto_now=True, )
-
-
 class DescriptionQuestion(SoftDeleteMixin, models.Model):
     question = models.CharField(max_length=255, )
     created_at = models.DateTimeField(auto_now_add=True, )
@@ -50,7 +34,6 @@ class Project(SoftDeleteMixin, models.Model):
     contacts = models.ManyToManyField(Contact)
     abilities = models.ManyToManyField(Ability)
     keywords = models.ManyToManyField(Keyword)
-    schedule = models.OneToOneField(Schedule, on_delete=models.PROTECT, )
     location = models.ForeignKey(Location, on_delete=models.PROTECT, )
 
 
@@ -58,6 +41,23 @@ class ProjectUserView(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, )
     created_at = models.DateTimeField(auto_now_add=True, )
+
+
+class ProjectSchedule(SoftDeleteMixin, models.Model):
+    project = models.OneToOneField(Project, related_name='schedule', on_delete=models.CASCADE, )
+    monday = models.BooleanField(default=False, )
+    tuesday = models.BooleanField(default=False, )
+    wednesday = models.BooleanField(default=False, )
+    thursday = models.BooleanField(default=False, )
+    friday = models.BooleanField(default=False, )
+    saturday = models.BooleanField(default=False, )
+    sunday = models.BooleanField(default=False, )
+    is_negotiable = models.BooleanField(default=False, )
+    recurring_type = models.ForeignKey(ScheduleRecurringType, on_delete=models.PROTECT, default=1, )
+    start_time = models.TimeField(default=datetime.time(00, 00), )
+    end_time = models.TimeField(default=datetime.time(00, 00), )
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
 
 
 class ProjectDescription(models.Model):
@@ -72,5 +72,6 @@ class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.PROTECT, )
     user = models.ForeignKey(User, on_delete=models.CASCADE, )
     role = models.CharField(max_length=20, )
+    is_active = models.BooleanField(default=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )

@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.db import transaction
 from project.models import (
     Project, DescriptionQuestion,
-    ProjectDescription, ScheduleRecurringType, Schedule,
+    ProjectDescription, ScheduleRecurringType, ProjectSchedule,
+    ProjectMember
 )
 from common.models import (
     Ability, Keyword, Contact, Media,
@@ -13,6 +14,7 @@ from common.serializers import (
     MediaSerializer, MediaSaveSerializer,
     AbilitySerializer, KeywordSerializer
 )
+from user.serializers import UserSimpleSerializer
 from location.serializers import LocationSerializer
 
 
@@ -22,9 +24,9 @@ class ScheduleRecurringTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', )
 
 
-class ScheduleSaveSerializer(serializers.ModelSerializer):
+class ProjectScheduleSaveSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Schedule
+        model = ProjectSchedule
         fields = (
             'monday',
             'tuesday',
@@ -40,10 +42,10 @@ class ScheduleSaveSerializer(serializers.ModelSerializer):
         )
 
 
-class ScheduleSerializer(serializers.ModelSerializer):
+class ProjectScheduleSerializer(serializers.ModelSerializer):
     recurring_type = ScheduleRecurringTypeSerializer()
     class Meta:
-        model = Schedule
+        model = ProjectSchedule
         fields = (
             'monday',
             'tuesday',
@@ -84,13 +86,23 @@ class ProjectDescriptionSerializer(serializers.ModelSerializer):
         return DescriptionQuestionSerializer(question).data
 
 
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    role = serializers.CharField()
+    user = UserSimpleSerializer()
+
+    class Meta:
+        model = ProjectMember
+        fields = ('role', 'user', )
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     descriptions = serializers.SerializerMethodField()
+    members = serializers.SerializerMethodField()
     media = MediaSerializer(many=True, )
     contacts = ContactSerializer(many=True, )
     abilities = AbilitySerializer(many=True, )
     keywords = KeywordSerializer(many=True, )
-    schedule = ScheduleSerializer()
+    schedule = ProjectScheduleSerializer()
     location = LocationSerializer()
 
     class Meta:
@@ -108,18 +120,23 @@ class ProjectSerializer(serializers.ModelSerializer):
             'keywords',
             'schedule',
             'location',
+            'members',
         )
     
     def get_descriptions(self, obj):
         descriptions = ProjectDescription.objects.filter(project=obj.id)
         return ProjectDescriptionSerializer(descriptions, many=True).data
 
+    def get_members(self, obj):
+        members = ProjectMember.objects.filter(project=obj.id, is_active=True, )
+        return ProjectMemberSerializer(members, many=True).data
+
 
 class ProjectSaveSerializer(serializers.ModelSerializer):
     descriptions = ProjectDescriptionSaveSerializer(many=True, )
     media = MediaSaveSerializer(many=True, )
     contacts = ContactSaveSerializer(many=True, )
-    schedule = ScheduleSaveSerializer()
+    schedule = ProjectScheduleSaveSerializer()
     abilities = serializers.ListField(child=serializers.CharField())
     keywords = serializers.ListField(child=serializers.CharField())
     location_code = serializers.CharField(source='location')
@@ -140,6 +157,12 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             'location_code',
         )
 
+    def __init__(self, http_request=None, *args, **kwargs):
+        self.http_request = http_request
+
+        # Instantiate the superclass normally
+        super(ProjectSaveSerializer, self).__init__(*args, **kwargs)
+
     @transaction.atomic
     def create(self, validated_data):
         descriptions_data = validated_data.pop('descriptions')
@@ -149,13 +172,9 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         contacts_data = validated_data.pop('contacts')
         schedule_data = validated_data.pop('schedule')
 
-        # One to One
-        schedule_serializer = ScheduleSaveSerializer(data=schedule_data)
-        if schedule_serializer.is_valid():
-            schedule = schedule_serializer.save()
-        else:
-            raise ValueError(schedule_serializer.errors)
+        user = self.http_request.user
 
+        # Add Location
         location = Location.objects.get(address_1_code=validated_data.get('location'), address_2_code__isnull=True)
 
         project = Project.objects.create(
@@ -164,9 +183,33 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             started_at=validated_data['started_at'],
             ends_at=validated_data['ends_at'],
             location=location,
-            schedule=schedule,
         )
         project.save()
+        print(schedule_data)
+        # One to One
+        schedule = ProjectSchedule(
+            project=project,
+            monday=schedule_data.get('monday'),
+            tuesday=schedule_data.get('tuesday'),
+            wednesday=schedule_data.get('wednesday'),
+            thursday=schedule_data.get('thursday'),
+            friday=schedule_data.get('friday'),
+            saturday=schedule_data.get('saturday'),
+            sunday=schedule_data.get('sunday'),
+            is_negotiable=schedule_data.get('is_negotiable'),
+            recurring_type=schedule_data.get('recurring_type'),
+            start_time=schedule_data.get('start_time'),
+            end_time=schedule_data.get('end_time'),
+        )
+        schedule.save()
+
+        # One to Many
+        project_admin = ProjectMember(
+            project=project,
+            user=user,
+            role='owner'
+        )
+        project_admin.save()
 
         # Many to Many
         for description_data in descriptions_data:
@@ -210,7 +253,5 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             project.keywords.add(keyword)
         
         project.save()
+
         return project
-
-
-    

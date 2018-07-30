@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^', include('common.urls', namespace='common')),
     url(r'^', include('project.urls', namespace='project')),
     url(r'^', include('location.urls', namespace='location')),
+    url(r'^', include('mailer.urls', namespace='mailer')),
     url(r'^', include('image.urls', namespace='image')),
 ]
