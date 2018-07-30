@@ -75,3 +75,10 @@ class ProjectMember(models.Model):
     is_active = models.BooleanField(default=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
+
+
+class ProjectMemberRequest(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, )
+    created_at = models.DateTimeField(auto_now_add=True, )
+    updated_at = models.DateTimeField(auto_now=True, )
