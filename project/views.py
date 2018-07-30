@@ -5,16 +5,18 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
+from base.exceptions import Conflict
 from common.models import Ability, Keyword, Contact
 from project.models import (
-    Project, ProjectMember, ScheduleRecurringType,
+    Project, ScheduleRecurringType,
     DescriptionQuestion, ProjectDescription, Media
 )
 from location.models import Location
+from user.models import User
 from project.serializers import (
     ScheduleRecurringTypeSerializer, DescriptionQuestionSerializer,
     ProjectSaveSerializer, ProjectSerializer, ProjectScheduleSaveSerializer,
-    ProjectMemberSerializer
+    ProjectMemberSaveSerializer, ProjectMemberSerializer
 )
 from base.mixins.custom_permissions import (
     PermissionClassesByAction, IsProjectOwner,
@@ -82,7 +84,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def retrieve(self, request, *args, **kwargs):
-        project_object = get_object_or_404(Project, pk=kwargs.get('pk'))
+        project_object = get_object_or_404(Project, pk=kwargs.get('project_id'))
         serializers = ProjectSerializer(project_object)
 
         return Response(serializers.data, status=status.HTTP_200_OK)
@@ -90,14 +92,14 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         # 프로젝트를 되살려야 할 수도 있기 때문에 프로젝트 모델만 소프트 딜리트 한다
-        project_object = get_object_or_404(Project, id=kwargs.get('pk'))
+        project_object = get_object_or_404(Project, id=kwargs.get('project_id'))
         project_object.delete()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
     def patch_profile_image(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         new_profile_image = request.data.get('profile_image')
         if not new_profile_image:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -110,7 +112,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_title(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         new_title = request.data.get('title')
         if not new_title:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -123,7 +125,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_location(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         new_location_code = request.data.get('location_code')
         if not new_location_code:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -137,7 +139,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_date(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         new_started_at = request.data.get('started_at')
         new_ends_at = request.data.get('ends_at')
         if not new_started_at or not new_ends_at:
@@ -152,7 +154,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_descriptions(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         descriptions_data = request.data.get('descriptions')
         ProjectDescription.objects.filter(project=project).delete()
         for description_data in descriptions_data:
@@ -168,7 +170,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_media(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         media_data = request.data.get('media')
         project.medai.all().delete()
         for media_data_object in media_data:
@@ -186,7 +188,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_schedules(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         schedule_data = request.data.get('schedule')
         schedule = project.schedule
         project_serializer = ProjectSerializer(project)
@@ -199,7 +201,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def patch_contacts(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         contacts_data = request.data.get('contacts')
         project.contacts.all().delete()
         for contact_data in contacts_data:
@@ -217,7 +219,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def add_ability(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         ability_string = request.data.get('ability')
         try:
             project.abilities.get(name=ability_string)
@@ -234,7 +236,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def remove_ability(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         ability = get_object_or_404(project.abilities, id=kwargs.get('ability_id'))
 
         new_count = ability.count - 1
@@ -247,7 +249,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def add_keyword(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         keyword_string = request.data.get('keyword')
         try:
             project.keywords.get(name=keyword_string)
@@ -264,7 +266,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
 
     def remove_keyword(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
         keyword = get_object_or_404(project.keywords, id=kwargs.get('keyword_id'))
 
         new_count = keyword.count - 1
@@ -283,13 +285,23 @@ class ProjectMemberViewSet(viewsets.ViewSet):
     permission_classes = (IsProjectOwner, )
 
     def add_member(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, id=kwargs.get('pk'))
-        is_owner = self.check_object_permissions(request, project)
+        project_id = kwargs.get('project_id')
+        project = get_object_or_404(Project, id=project_id)
+        user = get_object_or_404(User, id=request.data.get('user'))
+        self.check_object_permissions(request, project)
 
-        if not is_owner:
-            # Exception 걸 것
-            pass
-        me = request.user
+        request.data['project'] = project_id
+        serializer = ProjectMemberSaveSerializer(data=request.data)
+
+        if serializer.is_valid():
+            project_member = serializer.save()
+            project_member_serializer = ProjectMemberSerializer(project_member)
+
+            return Response(project_member_serializer.data, status=status.HTTP_201_CREATED)
+        elif serializer.errors.get('already_exist_user'):
+            raise Conflict(serializer.errors.get('already_exist_user')[0])
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
     def delete_member(self, request, *args, **kwargs):

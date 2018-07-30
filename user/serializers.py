@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from user.models import User, UserProfile
 
 class SignupUserSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class SigninUserSerializer(serializers.ModelSerializer):
             User.objects.get(email=email)
             pass
         except ObjectDoesNotExist:
-            raise serializers.ValidationError("존재하지 않는 유저입니다. 이메일을 다시 한번 확인해주세요")
+            raise serializers.ValidationError('존재하지 않는 유저입니다. 이메일을 다시 한번 확인해주세요')
 
         return email
 

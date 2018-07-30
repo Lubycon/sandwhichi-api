@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from project.models import (
     Project, DescriptionQuestion,
     ProjectDescription, ScheduleRecurringType, ProjectSchedule,
@@ -84,6 +85,33 @@ class ProjectDescriptionSerializer(serializers.ModelSerializer):
     def get_question(self, obj):
         question = DescriptionQuestion.objects.get(pk=obj.question.id)
         return DescriptionQuestionSerializer(question).data
+
+
+class ProjectMemberSaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectMember
+        fields = ('user', 'project', )
+
+    def validate(self, data):
+        project = data['project']
+        new_member = data['user']
+        try:
+            ProjectMember.objects.get(project=project, user=new_member, )
+            raise serializers.ValidationError({ 'already_exist_user': ['이미 해당 프로젝트에 존재하는 유저 입니다'] })
+        except ObjectDoesNotExist:
+            return data
+
+    def create(self, validated_data):
+        project = validated_data['project']
+        new_member = validated_data['user']
+
+        project_member = ProjectMember(
+            role='member',
+            user=new_member,
+            project=project,
+        )
+        project_member.save()
+        return project_member
 
 
 class ProjectMemberSerializer(serializers.ModelSerializer):
@@ -185,7 +213,7 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
             location=location,
         )
         project.save()
-        print(schedule_data)
+
         # One to One
         schedule = ProjectSchedule(
             project=project,

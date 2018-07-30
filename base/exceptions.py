@@ -18,3 +18,6 @@ class BadRequest(BaseCustomException):
 
 class BadFileRequest(BaseCustomException):
     status_code = 422
+
+class Conflict(BaseCustomException):
+    status_code = 409

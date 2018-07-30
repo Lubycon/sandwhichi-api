@@ -21,6 +21,5 @@ class PermissionClassesByAction():
 class IsProjectOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, project):
         owner = ProjectMember.objects.filter(project=project, role='owner')[0]
-        print(project)
-        print(owner)
-        return owner == request.user
+        owner_user = owner.user
+        return owner_user == request.user
