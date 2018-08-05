@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^auth/token/refresh/$', refresh_jwt_token),
     url(r'^auth/token/verify/$', verify_jwt_token),
     url(r'^auth/password/verify/$', account_views.PasswordViewSet.as_view()),
-    url(r'^auth/password/change/$', account_views.PasswordChangeViewSet.as_view()),
-    url(r'^auth/token/verify/password/change$', account_views.PasswordChangeTokenViewSet.as_view()),
-    url(r'^auth/token/verify/email/certification$', account_views.EmailCertificationTokenViewSet.as_view()),
+    url(r'^auth/password/change/email/$', account_views.PasswordChangeViewSet.as_view()),
+    url(r'^auth/token/verify/password/change/email/$', account_views.PasswordChangeTokenViewSet.as_view()),
+    url(r'^auth/token/verify/email/certification/$', account_views.EmailCertificationTokenViewSet.as_view()),
 ]

@@ -7,6 +7,7 @@ from base.exceptions import BadRequest
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from user.models import User
 
 
 class Signup(APIView):
@@ -57,6 +58,7 @@ class PasswordViewSet(APIView):
     """
     비밀번호 인증 API
     """
+
     permission_classes = (IsAuthenticated, )
     def post(self, request, format='json'):
         user = request.user
@@ -73,18 +75,25 @@ class PasswordViewSet(APIView):
 
 class PasswordChangeTokenViewSet(APIView):
     """
-    비밀번호 변경 토큰 검증 API
+    로그인 안된 유저 비밀번호 변경 토큰 검증 API
     """
-    permission_classes = (IsAuthenticated, )
+
     def post(self, request, format='json'):
-        user = request.user
+        email = request.data.get('email')
         token = request.data.get('token')
+        user_list = User.objects.filter(email=email, )
+
+        if not email:
+            raise BadRequest('이메일 주소를 입력해주세요')
         if not token:
             raise BadRequest('이메일로 발송되었던 토큰을 입력해주세요')
+        if not user_list.exists():
+            raise BadRequest('존재하지 않는 유저 이메일 입니다')
 
+        user = user_list.first()
         is_valid = PasswordResetTokenGenerator().check_token(user, token)
         if not is_valid:
-            raise BadRequest('올바르지 않은 토큰입니다. 비밀번호 변경 이메일을 재발송 해주세요.')
+            raise BadRequest('유효하지 않은 토큰입니다. 비밀번호 변경 이메일을 재발송 해주세요.')
 
         data = {
             'token': token
@@ -94,23 +103,30 @@ class PasswordChangeTokenViewSet(APIView):
 
 class PasswordChangeViewSet(APIView):
     """
-    비밀번호 변경 API
+    로그인 안된 유저 비밀번호 변경 API
     """
-    permission_classes = (IsAuthenticated, )
-    def put(self, request, format='json'):
-        user = request.user
-        token = request.data.get('token')
-        new_password = request.data.get('password')
 
+    def put(self, request, format='json'):
+        email = request.data.get('email')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+        user_list = User.objects.filter(email=email, )
+
+        if not email:
+            raise BadRequest('이메일 주소를 입력해주세요')
         if not token:
             raise BadRequest('이메일로 발송되었던 토큰을 입력해주세요')
+        if not new_password:
+            raise BadRequest('새로 등록하실 비밀번호를 입력해주세요')
+        if not user_list.exists():
+            raise BadRequest('존재하지 않는 유저 이메일 입니다')
 
+        user = user_list.first()
+        print(user)
         is_token_valid = PasswordResetTokenGenerator().check_token(user, token)
 
         if not is_token_valid:
             raise BadRequest('올바르지 않은 토큰입니다. 비밀번호 변경 이메일을 재발송 해주세요.')
-        elif not new_password:
-            raise BadRequest('새로 등록하실 비밀번호를 입력해주세요')
 
         user.set_password(new_password)
         user.save()
