@@ -94,13 +94,15 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         # 프로젝트를 되살려야 할 수도 있기 때문에 프로젝트 모델만 소프트 딜리트 한다
-        project_object = get_object_or_404(Project, id=kwargs.get('project_id'))
-        project_object.delete()
+        project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
+        project.delete()
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     def patch_profile_image(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         new_profile_image = request.data.get('profile_image')
         if not new_profile_image:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -113,6 +115,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_title(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         new_title = request.data.get('title')
         if not new_title:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -125,6 +128,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_location(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         new_location_code = request.data.get('location_code')
         if not new_location_code:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -138,6 +142,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_date(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         new_started_at = request.data.get('started_at')
         new_ends_at = request.data.get('ends_at')
         if not new_started_at or not new_ends_at:
@@ -152,6 +157,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_descriptions(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         descriptions_data = request.data.get('descriptions')
         ProjectDescription.objects.filter(project=project).delete()
         for description_data in descriptions_data:
@@ -167,6 +173,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_media(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         media_data = request.data.get('media')
         project.medai.all().delete()
         for media_data_object in media_data:
@@ -184,6 +191,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_schedules(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         schedule_data = request.data.get('schedule')
         schedule = project.schedule
         project_serializer = ProjectSerializer(project)
@@ -196,6 +204,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def patch_contacts(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         contacts_data = request.data.get('contacts')
         project.contacts.all().delete()
         for contact_data in contacts_data:
@@ -213,6 +222,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def add_ability(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         ability_string = request.data.get('ability')
         try:
             project.abilities.get(name=ability_string)
@@ -229,6 +239,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def remove_ability(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         ability = get_object_or_404(project.abilities, id=kwargs.get('ability_id'))
 
         new_count = ability.count - 1
@@ -241,6 +252,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def add_keyword(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         keyword_string = request.data.get('keyword')
         try:
             project.keywords.get(name=keyword_string)
@@ -257,6 +269,7 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def remove_keyword(self, request, *args, **kwargs):
         project = get_object_or_404(Project, id=kwargs.get('project_id'))
+        self.check_object_permissions(request, project)
         keyword = get_object_or_404(project.keywords, id=kwargs.get('keyword_id'))
 
         new_count = keyword.count - 1
@@ -280,6 +293,7 @@ class ProjectMemberManageViewSet(PermissionClassesByAction, viewsets.ViewSet):
     def add_member(self, request, *args, **kwargs):
         project_id = kwargs.get('project_id')
         project = get_object_or_404(Project, id=project_id)
+        self.check_object_permissions(request, project)
 
         get_object_or_404(User, id=request.data.get('user'))
 
@@ -304,6 +318,9 @@ class ProjectMemberManageViewSet(PermissionClassesByAction, viewsets.ViewSet):
 
     def patch_role(self, request, *args, **kwargs):
         project_id = kwargs.get('project_id')
+        project = get_object_or_404(Project, id=project_id)
+        self.check_object_permissions(request, project)
+
         user_id = kwargs.get('user_id')
         project_member = get_object_or_404(ProjectMember, project=project_id, user=user_id, )
         new_role = request.data.get('role')
@@ -323,6 +340,34 @@ class ProjectMemberManageViewSet(PermissionClassesByAction, viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+    def appointment_owner(self, request, *args, **kwargs):
+        project_id = kwargs.get('project_id')
+        project = get_object_or_404(Project, id=project_id)
+        self.check_object_permissions(request, project)
+
+        user_id = kwargs.get('user_id')
+        project_member = get_object_or_404(ProjectMember, project=project_id, user=user_id, )
+        project_owner = ProjectMember.objects.get(role=ProjectMemberRoles.OWNER.name)
+
+        project_owner.role = ProjectMemberRoles.ADMIN.name
+        project_member.role = ProjectMemberRoles.OWNER.name
+
+        project_owner.save()
+        project_member.save()
+
+        new_owner = project_member
+        old_owner = project_owner
+
+        new_owner_serializer = ProjectMemberSerializer(new_owner)
+        old_owner_serializer = ProjectMemberSerializer(old_owner)
+
+        result_data = {
+            'new_owner': new_owner_serializer.data,
+            'old_owner': old_owner_serializer.data,
+        }
+
+        return Response(result_data, status=status.HTTP_200_OK)
 
 
 class ProjectMemberRequestViewSet(viewsets.ViewSet):
