@@ -324,11 +324,15 @@ class ProjectMemberRequestViewSet(viewsets.ViewSet):
 
     def create(self, request, *args, **kwargs):
         project_id = kwargs.get('project_id')
+        # 404 Exception
+        get_object_or_404(Project, id=project_id)
+
         user = request.user
         data = {
             'project': project_id,
             'user': user.id,
         }
+
         serializer = ProjectMemberRequestSaveSerializer(data=data)
 
         if serializer.is_valid():
@@ -336,5 +340,7 @@ class ProjectMemberRequestViewSet(viewsets.ViewSet):
             return Response({}, status=status.HTTP_201_CREATED, )
         elif serializer.errors.get('already_exist_request'):
             raise Conflict(serializer.errors.get('already_exist_request'))
+        elif serializer.errors.get('already_exist_member'):
+            raise Conflict(serializer.errors.get('already_exist_member'))
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST, )

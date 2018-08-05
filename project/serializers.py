@@ -95,11 +95,17 @@ class ProjectMemberSaveSerializer(serializers.ModelSerializer):
     def validate(self, data):
         project = data.get('project')
         new_member = data.get('user')
-        try:
-            ProjectMember.objects.get(project=project, user=new_member, )
+
+        is_exist_member = ProjectMember.objects.filter(project=project, user=new_member, )
+        has_request = ProjectMemberRequest.objects.filter(project=project, user=new_member, )
+
+        if is_exist_member:
             raise serializers.ValidationError({ 'already_exist_user': '이미 해당 프로젝트에 존재하는 유저 입니다' })
-        except ObjectDoesNotExist:
+        elif not has_request:
+            raise serializers.ValidationError({ 'has_not_request': '프로젝트에 참여 신청했던 유저가 아닙니다' })
+        else:
             return data
+
 
     def create(self, validated_data):
         project = validated_data['project']
@@ -129,14 +135,17 @@ class ProjectMemberRequestSaveSerializer(serializers.ModelSerializer):
         fields = ('project', 'user', )
 
     def validate(self, data):
-        # TODO 이미 참여되어있는 프로젝트에는 참여신청 못하도록 막아야함
         project = data.get('project')
         user = data.get('user')
 
-        try:
-            ProjectMemberRequest.objects.get(project=project, user=user, )
+        is_exist_request = ProjectMemberRequest.objects.filter(project=project, user=user, ).exists()
+        is_exist_member = ProjectMember.objects.filter(project=project, user=user, ).exists()
+
+        if is_exist_request:
             raise serializers.ValidationError({ 'already_exist_request': '이미 해당 프로젝트에 참여 신청을 하셨습니다' })
-        except ObjectDoesNotExist:
+        elif is_exist_member:
+            raise serializers.ValidationError({ 'already_exist_member': '이미 해당 프로젝트의 멤버로 등록되어있습니다' })
+        else:
             return data
 
 
