@@ -6,7 +6,7 @@ from common.models import (
 )
 from location.models import Location
 from user.models import User
-from base.enums import RequestStatus, get_enum_to_tuple
+from base.enums import RequestStatus
 
 
 class ScheduleRecurringType(SoftDeleteMixin, models.Model):
@@ -82,9 +82,8 @@ class ProjectMemberRequest(models.Model):
     class Meta:
         ordering = ('-created_at', )
 
-    # TODO 상태값 추가해야함. 신청됨, 거부됨, 승인됨 3개임
     project = models.ForeignKey(Project, on_delete=models.CASCADE, )
     user = models.ForeignKey(User, on_delete=models.CASCADE, )
-    status = models.CharField(max_length=20, choices=get_enum_to_tuple(RequestStatus), )
+    status = models.CharField(max_length=10, choices=RequestStatus.choices(), )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )

@@ -132,7 +132,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
 class ProjectMemberRequestSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectMemberRequest
-        fields = ('project', 'user', )
+        fields = ('project', 'user', 'status', )
 
     def validate(self, data):
         project = data.get('project')

@@ -23,6 +23,7 @@ from project.serializers import (
 from base.mixins.custom_permissions import (
     PermissionClassesByAction, IsProjectOwner,
 )
+from base.enums import RequestStatus
 
 class ScheduleRecurringTypeViewSet(APIView):
     """
@@ -331,6 +332,7 @@ class ProjectMemberRequestViewSet(viewsets.ViewSet):
         data = {
             'project': project_id,
             'user': user.id,
+            'status': RequestStatus.REQUESTED.name,
         }
 
         serializer = ProjectMemberRequestSaveSerializer(data=data)

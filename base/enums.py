@@ -1,17 +1,17 @@
 from enum import Enum, EnumMeta
 
-def get_enum_to_tuple(enum_klass):
-    if type(enum_klass) is EnumMeta:
-        return [(el, el.value) for el in enum_klass]
-    else:
-        return []
+class ChoiceEnum(Enum):
+    @classmethod
+    def choices(cls):
+        return ((i.name, i.value) for i in cls)
 
-class RequestStatus(Enum):
+class RequestStatus(ChoiceEnum):
     # 요청됨
     # 승인됨
     # 거부됨
     REQUESTED = 'Requested'
     ACCEPTED = 'Accepted'
     REJECTED = 'Rejected'
+    CANCELED = 'Canceled'
 
 
