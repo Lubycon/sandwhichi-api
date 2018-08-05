@@ -21,7 +21,7 @@ class PasswordChange(APIView):
         if not user_list.exists():
             raise BadRequest('존재하지 않는 회원 이메일입니다')
 
-        user = user_list[0]
+        user = user_list.first()
         template_path = 'email/password_change/password_change'
 
         token = PasswordResetTokenGenerator().make_token(user)
