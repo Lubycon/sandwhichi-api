@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
 from project.models import (
     Project, DescriptionQuestion,
     ProjectDescription, ScheduleRecurringType, ProjectSchedule,
@@ -17,6 +16,7 @@ from common.serializers import (
 )
 from user.serializers import UserSimpleSerializer
 from location.serializers import LocationSerializer
+from base.enums import ProjectMemberRoles, RequestStatus
 
 
 class ScheduleRecurringTypeSerializer(serializers.ModelSerializer):
@@ -96,26 +96,39 @@ class ProjectMemberSaveSerializer(serializers.ModelSerializer):
         project = data.get('project')
         new_member = data.get('user')
 
-        is_exist_member = ProjectMember.objects.filter(project=project, user=new_member, )
-        has_request = ProjectMemberRequest.objects.filter(project=project, user=new_member, )
+        is_exist_member = ProjectMember.objects.filter(
+            project=project,
+            user=new_member).exists()
+        has_request = ProjectMemberRequest.objects.filter(
+            project=project,
+            user=new_member,
+            status=RequestStatus.REQUESTED.name).exists()
 
         if is_exist_member:
             raise serializers.ValidationError({ 'already_exist_user': '이미 해당 프로젝트에 존재하는 유저 입니다' })
         elif not has_request:
-            raise serializers.ValidationError({ 'has_not_request': '프로젝트에 참여 신청했던 유저가 아닙니다' })
+            raise serializers.ValidationError({ 'has_not_request': '프로젝트에 참여 신청한 유저가 아닙니다' })
         else:
             return data
 
     def create(self, validated_data):
         project = validated_data['project']
         new_member = validated_data['user']
-
+        member_request = ProjectMemberRequest.objects.get(
+            project=project,
+            user=new_member,
+            status=RequestStatus.REQUESTED.name
+        )
         project_member = ProjectMember(
-            role='member',
+            role=ProjectMemberRoles.MEMBER.name,
             user=new_member,
             project=project,
         )
         project_member.save()
+
+        member_request.status = RequestStatus.ACCEPTED.name
+        member_request.save()
+
         return project_member
 
 
@@ -137,7 +150,9 @@ class ProjectMemberRequestSaveSerializer(serializers.ModelSerializer):
         project = data.get('project')
         user = data.get('user')
 
-        is_exist_request = ProjectMemberRequest.objects.filter(project=project, user=user, ).exists()
+        is_exist_request = ProjectMemberRequest.objects.filter(
+            project=project, user=user,
+        ).exclude(status=RequestStatus.CANCELED.name).exists()
         is_exist_member = ProjectMember.objects.filter(project=project, user=user, ).exists()
 
         if is_exist_request:
@@ -263,12 +278,12 @@ class ProjectSaveSerializer(serializers.ModelSerializer):
         schedule.save()
 
         # One to Many
-        project_admin = ProjectMember(
+        project_owner = ProjectMember(
             project=project,
             user=user,
-            role='owner'
+            role=ProjectMemberRoles.OWNER.name
         )
-        project_admin.save()
+        project_owner.save()
 
         # Many to Many
         for description_data in descriptions_data:

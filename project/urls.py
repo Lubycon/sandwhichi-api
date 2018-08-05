@@ -61,17 +61,18 @@ project_keyword = project_views.ProjectViewSet.as_view({
     'delete': 'remove_keyword',
 })
 
-project_members = project_views.ProjectMemberViewSet.as_view({
+project_manage_members = project_views.ProjectMemberManageViewSet.as_view({
     'post': 'add_member',
 })
 
-project_member = project_views.ProjectMemberViewSet.as_view({
+project_manage_member = project_views.ProjectMemberManageViewSet.as_view({
     'delete': 'delete_member',
     'patch': 'patch_role',
 })
 
 project_requests = project_views.ProjectMemberRequestViewSet.as_view({
     'post': 'create',
+    'delete': 'cancel',
 })
 
 urlpatterns = [
@@ -92,8 +93,8 @@ urlpatterns = [
     url(r'^projects/(?P<project_id>[0-9]+)/keywords/$', project_keywords, name='project-keywords'),
     url(r'^projects/(?P<project_id>[0-9]+)/keywords/(?P<keyword_id>[0-9]+)/$', project_keyword, name='project-keyword'),
 
-    url(r'^projects/(?P<project_id>[0-9]+)/members/$', project_members, name='project_member'),
-    url(r'^projects/(?P<project_id>[0-9]+)/members/(?P<user_id>[0-9]+)/$', project_member, name='project_member'),
+    url(r'^projects/(?P<project_id>[0-9]+)/members/$', project_manage_members, name='project_member'),
+    url(r'^projects/(?P<project_id>[0-9]+)/members/(?P<user_id>[0-9]+)/$', project_manage_member, name='project_member'),
 
     url(r'^projects/(?P<project_id>[0-9]+)/requests/$', project_requests, name='project_requests'),
 

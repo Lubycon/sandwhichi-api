@@ -6,7 +6,7 @@ from common.models import (
 )
 from location.models import Location
 from user.models import User
-from base.enums import RequestStatus
+from base.enums import RequestStatus, ProjectMemberRoles
 
 
 class ScheduleRecurringType(SoftDeleteMixin, models.Model):
@@ -72,7 +72,7 @@ class ProjectDescription(models.Model):
 class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.PROTECT, )
     user = models.ForeignKey(User, on_delete=models.CASCADE, )
-    role = models.CharField(max_length=20, )
+    role = models.CharField(max_length=10, choices=ProjectMemberRoles.choices(), )
     is_active = models.BooleanField(default=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )

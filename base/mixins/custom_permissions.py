@@ -20,6 +20,20 @@ class PermissionClassesByAction():
 
 class IsProjectOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, project):
-        owner = ProjectMember.objects.filter(project=project, role='owner')[0]
+        owner = ProjectMember.objects.filter(project=project, role='owner').first()
         owner_user = owner.user
         return owner_user == request.user
+
+
+class IsProjectAdmin(permissions.BasePermission):
+    def has_object_permission(self, request, view, project):
+        user = request.user
+        project_admins = ProjectMember.objects.filter(project=project, role='admin', user=user, )
+        return project_admins.exists()
+
+
+class IsProjectMember(permissions.BasePermission):
+    def has_object_permission(self, request, view, project):
+        user = request.user
+        project_members = ProjectMember.objects.filter(project=project, user=user, )
+        return project_members.exists()
