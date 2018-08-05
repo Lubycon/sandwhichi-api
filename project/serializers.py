@@ -106,7 +106,6 @@ class ProjectMemberSaveSerializer(serializers.ModelSerializer):
         else:
             return data
 
-
     def create(self, validated_data):
         project = validated_data['project']
         new_member = validated_data['user']

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from user.serializers import SignupUserSerializer
 from base.handlers.jwt import get_jwt, jwt_response_payload_handler
-from base.exceptions import BadRequest
+from base.exceptions import BadRequest, Conflict, NotFound
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -27,7 +27,7 @@ class Signup(APIView):
 
                 return Response(response, status=status.HTTP_201_CREATED)
         elif serializer.errors.get('email'):
-            raise BadRequest('이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요')
+            raise Conflict('이미 존재하는 이메일입니다. 다른 이메일을 사용해주세요')
         elif serializer.errors.get('password'):
             raise BadRequest('양식에 맞지 않는 비밀번호입니다. 좀 더 복잡한 비밀번호를 사용해주세요.')
         elif serializer.errors.get('has_terms'):
@@ -88,7 +88,7 @@ class PasswordChangeTokenViewSet(APIView):
         if not token:
             raise BadRequest('이메일로 발송되었던 토큰을 입력해주세요')
         if not user_list.exists():
-            raise BadRequest('존재하지 않는 유저 이메일 입니다')
+            raise NotFound('존재하지 않는 유저 이메일 입니다')
 
         user = user_list.first()
         is_valid = PasswordResetTokenGenerator().check_token(user, token)
@@ -119,10 +119,9 @@ class PasswordChangeViewSet(APIView):
         if not new_password:
             raise BadRequest('새로 등록하실 비밀번호를 입력해주세요')
         if not user_list.exists():
-            raise BadRequest('존재하지 않는 유저 이메일 입니다')
+            raise NotFound('존재하지 않는 유저 이메일 입니다')
 
         user = user_list.first()
-        print(user)
         is_token_valid = PasswordResetTokenGenerator().check_token(user, token)
 
         if not is_token_valid:
@@ -137,7 +136,9 @@ class EmailCertificationTokenViewSet(APIView):
     """
     이메일 인증 토큰 검증 API
     """
+
     permission_classes = (IsAuthenticated, )
+
     def post(self, request, format='json'):
         user = request.user
         token = request.data.get('token')

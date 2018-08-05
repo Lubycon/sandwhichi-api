@@ -16,6 +16,9 @@ class InternalServerError(BaseCustomException):
 class BadRequest(BaseCustomException):
     status_code = 400
 
+class NotFound(BaseCustomException):
+    status_code = 404
+
 class BadFileRequest(BaseCustomException):
     status_code = 422
 

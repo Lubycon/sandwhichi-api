@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.filters import OrderingFilter
-from base.exceptions import Conflict
+from base.exceptions import Conflict, NotFound
 from common.models import Ability, Keyword, Contact
 from project.models import (
     Project, ScheduleRecurringType,
@@ -302,7 +302,9 @@ class ProjectMemberViewSet(viewsets.ViewSet):
 
             return Response(project_member_serializer.data, status=status.HTTP_201_CREATED)
         elif serializer.errors.get('already_exist_user'):
-            raise Conflict(serializer.errors.get('already_exist_user'))
+            raise Conflict(serializer.errors.get('already_exist_user')[0])
+        elif serializer.errors.get('has_not_request'):
+            raise NotFound(serializer.errors.get('has_not_request')[0])
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -341,8 +343,8 @@ class ProjectMemberRequestViewSet(viewsets.ViewSet):
             serializer.save()
             return Response({}, status=status.HTTP_201_CREATED, )
         elif serializer.errors.get('already_exist_request'):
-            raise Conflict(serializer.errors.get('already_exist_request'))
+            raise Conflict(serializer.errors.get('already_exist_request')[0])
         elif serializer.errors.get('already_exist_member'):
-            raise Conflict(serializer.errors.get('already_exist_member'))
+            raise Conflict(serializer.errors.get('already_exist_member')[0])
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST, )
