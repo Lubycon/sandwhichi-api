@@ -10,7 +10,13 @@ user_detail = user_views.UserViewSet.as_view({
     'get': 'retrieve',
 })
 
+my_info = user_views.MeViewSet.as_view({
+    'get': 'retrieve'
+})
+
 urlpatterns = [
     url(r'^users/$', user_list, name='user-list'),
     url(r'^users/(?P<user_id>[0-9]+)/$', user_detail, name='user-detail'),
+
+    url(r'^me/$', my_info, name='my-info'),
 ]

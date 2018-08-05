@@ -28,10 +28,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         project_object = get_object_or_404(User, pk=kwargs.get('user_id'))
-        serializers = UserSimpleSerializer(project_object)
+        serializer = UserSimpleSerializer(project_object)
 
-        return Response(serializers.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = UserSimpleSerializer(request.user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

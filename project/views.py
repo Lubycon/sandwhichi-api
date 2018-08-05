@@ -88,9 +88,9 @@ class ProjectViewSet(PermissionClassesByAction, viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         project_object = get_object_or_404(Project, pk=kwargs.get('project_id'))
-        serializers = ProjectSerializer(project_object)
+        serializer = ProjectSerializer(project_object)
 
-        return Response(serializers.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         # 프로젝트를 되살려야 할 수도 있기 때문에 프로젝트 모델만 소프트 딜리트 한다
