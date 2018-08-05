@@ -1,18 +1,27 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from base.exceptions import BadRequest
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from base.helpers import email_helper
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from user.models import User
 
 class PasswordChange(APIView):
     """
     비밀번호 변경 이메일 발송
     """
-    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
-        user = request.user
-        user_email = user.email
+        user_email = request.data.get('email')
+        user_list = User.objects.filter(email=user_email)
+
+        if not user_email:
+            raise BadRequest('이메일을 입력해주세요')
+        if not user_list.exists():
+            raise BadRequest('존재하지 않는 회원 이메일입니다')
+
+        user = user_list[0]
         template_path = 'email/password_change/password_change'
 
         token = PasswordResetTokenGenerator().make_token(user)
