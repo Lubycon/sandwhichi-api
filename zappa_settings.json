@@ -12,7 +12,8 @@
         "async_resources": true,
         "certificate_arn": "arn:aws:acm:us-east-1:900126419604:certificate/4498324b-cf2c-4d21-81aa-3955fc3f3509",
         "vpc_config" : {
-            "SubnetIds": [ "subnet-33d3df5b","subnet-85d7a7c9" ] // use the private subnet
+            "SubnetIds": [ "subnet-33d3df5b","subnet-85d7a7c9" ], // use the private subnet
+            "SecurityGroupIds": [ "sg-04c04320bad3bbd9d" ]
         }
     }
 }
