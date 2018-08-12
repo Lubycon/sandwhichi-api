@@ -1,0 +1,19 @@
+{
+    "dev": {
+        "aws_region": "ap-northeast-2",
+        "django_settings": "settings",
+        "profile_name": "sandwhichi",
+        "project_name": "service-api",
+        "runtime": "python3.6",
+        "s3_bucket": "sandwhichi-service-api",
+        "remote_env": "s3://sandwhichi-super-secret-env/dev.json",
+        "domain": "dev.api.sandwhichi.com",
+        "async_source": "sns",
+        "async_resources": true,
+        "certificate_arn": "arn:aws:acm:us-east-1:900126419604:certificate/0fca83cc-4054-480d-8567-4d4772d8cd86",
+        "vpc_config" : {
+            "SubnetIds": [ "subnet-85d7a7c9","subnet-33d3df5b" ], // use the public subnet
+            "SecurityGroupIds": [ "sg-04c04320bad3bbd9d" ]
+        }
+    }
+}
