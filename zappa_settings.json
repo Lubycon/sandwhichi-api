@@ -10,7 +10,7 @@
         "domain": "dev.api.sandwhichi.com",
         "async_source": "sns",
         "async_resources": true,
-        "certificate_arn": "arn:aws:acm:us-east-1:900126419604:certificate/4498324b-cf2c-4d21-81aa-3955fc3f3509",
+        "certificate_arn": "arn:aws:acm:us-east-1:900126419604:certificate/0fca83cc-4054-480d-8567-4d4772d8cd86",
         "vpc_config" : {
             "SubnetIds": [ "subnet-85d7a7c9","subnet-33d3df5b" ], // use the public subnet
             "SecurityGroupIds": [ "sg-04c04320bad3bbd9d" ]
