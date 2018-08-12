@@ -42,3 +42,10 @@ $ zappa deploy {envirment}
 # Copy file
 $ zappa update {envirment}
 ```
+
+AWS 인프 환경에서 마이그레이션
+
+```bash
+# Copy file
+$ zappa manage {envirment} migrate
+```
