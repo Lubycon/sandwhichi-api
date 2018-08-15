@@ -15,8 +15,9 @@ my_info = user_views.MeViewSet.as_view({
 })
 
 urlpatterns = [
+    url(r'users/exists/email/', user_views.IsExistEmailViewSet.as_view(), name='is-exist-email'),
     url(r'^users/$', user_list, name='user-list'),
     url(r'^users/(?P<user_id>[0-9]+)/$', user_detail, name='user-detail'),
 
-    url(r'^me/$', my_info, name='my-info'),
+    url(r'^users/me/$', my_info, name='my-info'),
 ]

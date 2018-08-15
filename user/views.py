@@ -2,9 +2,26 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
+from rest_framework.views import APIView
 from user.models import User
 from user.serializers import UserSimpleSerializer
 from django.shortcuts import get_object_or_404
+from base.exceptions import BadRequest
+
+
+class IsExistEmailViewSet(APIView):
+    """
+    이메일 존재 여부 확인 API
+    """
+    def post(self, request, format='json'):
+        email = request.data.get('email')
+
+        if not email:
+            BadRequest('이메일 주소를 입력해주세요')
+
+        is_exist = User.objects.filter(email=email).exists()
+        return Response({ 'is_exist': is_exist }, status=status.HTTP_200_OK)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """

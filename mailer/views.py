@@ -25,7 +25,7 @@ class PasswordChange(APIView):
         template_path = 'email/password_change/password_change'
 
         token = PasswordResetTokenGenerator().make_token(user)
-        redirect_url = '/auth/password/landing/%s' % (token)
+        redirect_url = '/auth/password/landing/%s?email=%s' % (token, user_email)
 
         context = {
             'username': user.username,
