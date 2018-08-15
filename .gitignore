@@ -100,3 +100,5 @@ cache/
 
 # vscode
 .vscode/
+
+.local-super-secret-env.json

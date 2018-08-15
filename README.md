@@ -20,3 +20,32 @@ $ pip install MySQL-python
 $ make run
 ```
 
+로컬 환경 변수를 관리하는 .local-super-secret-env.json 파일을 반드시 생성하고 내용을 채워주세요
+
+```bash
+# Copy file
+$ cp .local-super-secret-env.json.example .local-super-secret-env.json
+
+# SUPER_SECRET을 모두 채워주세요.
+```
+
+첫 배포
+
+```bash
+# Copy file
+$ zappa deploy {envirment}
+```
+
+첫 배포후 업데이트
+
+```bash
+# Copy file
+$ zappa update {envirment}
+```
+
+AWS 인프 환경에서 마이그레이션
+
+```bash
+# Copy file
+$ zappa manage {envirment} migrate
+```

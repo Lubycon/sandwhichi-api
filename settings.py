@@ -12,21 +12,30 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import datetime
+import json
+
 APPLICATION_ENV = os.environ.get("APPLICATION_ENV", 'local')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+# Register env variables on localhost
+if 'SERVERTYPE' not in os.environ:
+    json_data = open(os.path.join(BASE_DIR, '.local-super-secret-env.json'))
+    env_vars = json.load(json_data)
+    for key, value in env_vars.items():
+        os.environ[key] = value
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '&mx%m)l0r)h+lm2en$1v7dp(!aic&2d82yjk!$h8_!o#p9bvp9'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG") == 'True'
 
-ALLOWED_HOSTS = ['local.sandwhichi.com']
+ALLOWED_HOSTS = list(os.environ.get("ALLOWED_HOSTS"))
 
 # Application definition
 AUTH_USER_MODEL = 'user.User'
@@ -63,7 +72,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ('local.sandwhichi.com:3000', )
+CORS_ORIGIN_WHITELIST = tuple(os.environ.get("ALLOWED_HOSTS"))
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -95,18 +104,18 @@ SWAGGER_SETTINGS = {
 }
 
 # S3 bucket settings
-AWS_S3_ACCESS_KEY_ID = 'AKIAJUPFBBGVTYQIVGHA'
-AWS_S3_SECRET_ACCESS_KEY = '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'
-RAW_IMAGE_BUCKET_BASE_URL = 'https://sandwhichi-dev-raw-image.s3.ap-northeast-2.amazonaws.com/'
-RAW_IMAGE_BUCKET_NAME = 'sandwhichi-dev-raw-image'
-RAW_IMAGE_BUCKET_REGION_NAME = 'ap-northeast-2'
+AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_S3_ACCESS_KEY_ID")
+AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_S3_SECRET_ACCESS_KEY")
+RAW_IMAGE_BUCKET_BASE_URL = os.environ.get("RAW_IMAGE_BUCKET_BASE_URL")
+RAW_IMAGE_BUCKET_NAME = os.environ.get("RAW_IMAGE_BUCKET_NAME")
+RAW_IMAGE_BUCKET_REGION_NAME = os.environ.get("RAW_IMAGE_BUCKET_REGION_NAME")
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'AKIAI3TWYMRG4V44NAUQ' # AWS_SES_ACCESS_KEY_ID
-EMAIL_HOST_PASSWORD = 'Ah5dAsyg9+Db9x8g+oeLOMnSS22EcehHanImWJ/vKuSc' # AWS_SES_SECRET_ACCESS_KEY
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")  # AWS_SES_ACCESS_KEY_ID
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")  # AWS_SES_SECRET_ACCESS_KEY
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'Sandwhichi <noreply@sandwhichi.com>'
 EMAIL_SUBJECT_PREFIX = '[Sandwhichi]'
@@ -138,11 +147,11 @@ WSGI_APPLICATION = 'wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sandwhichi',
-        'USER': 'root',
-        'PASSWORD': 'secret',
-        'HOST': 'local.sandwhichi.com',
-        'PORT': '33061',
+        'NAME':  os.environ.get("DATABASE_MASTER_NAME"),
+        'USER':  os.environ.get("DATABASE_MASTER_USER"),
+        'PASSWORD':  os.environ.get("DATABASE_MASTER_PASSWORD"),
+        'HOST':  os.environ.get("DATABASE_MASTER_HOST"),
+        'PORT':  os.environ.get("DATABASE_MASTER_PORT"),
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
             'charset': 'utf8mb4',
@@ -151,7 +160,6 @@ DATABASES = {
         },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -190,9 +198,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Social Access
-NAVER_LOGIN_CLIENT_ID = 'HAjQ7lH1Jk8PqJUeHajh'
-NAVER_LOGIN_SECRET = 'hI6ia8l3HQ'
-GOOGLE_PLUS_CLIENT_ID = '910544055896-tiucajkqq3pt6l38v7kge5h6q20cs3ai.apps.googleusercontent.com'
-GOOGLE_PLUS_SECRET= '-NB71lIhG2lj5spc4IZGZ5Mf'
