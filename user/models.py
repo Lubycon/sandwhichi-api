@@ -55,5 +55,6 @@ class UserProfile(SoftDeleteMixin, models.Model):
     abilities = models.ManyToManyField(Ability)
     keywords = models.ManyToManyField(Keyword)
     is_certified_email = models.BooleanField(default=False, )
+    description = models.CharField(max_length=100, null=True, )
     created_at = models.DateTimeField(auto_now_add=True, )
     updated_at = models.DateTimeField(auto_now=True, )
