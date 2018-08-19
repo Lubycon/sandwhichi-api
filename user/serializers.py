@@ -55,7 +55,7 @@ class SigninUserSerializer(serializers.ModelSerializer):
 class MyUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ('profile_image', 'abilities', 'keywords', 'is_certified_email', )
+        fields = ('profile_image', 'abilities', 'keywords', 'is_certified_email', 'description', )
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -63,7 +63,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     keywords = KeywordSerializer(many=True, )
     class Meta:
         model = UserProfile
-        fields = ('profile_image', 'abilities', 'keywords', )
+        fields = ('profile_image', 'abilities', 'keywords', 'description', )
 
 
 class MyUserSimpleSerializer(serializers.ModelSerializer):
