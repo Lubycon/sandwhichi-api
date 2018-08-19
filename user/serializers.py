@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from user.models import User, UserProfile
+from common.serializers import AbilitySerializer, KeywordSerializer
 
 class SignupUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, min_length=2, max_length=30)
@@ -58,6 +59,8 @@ class MyUserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    abilities = AbilitySerializer(many=True, )
+    keywords = KeywordSerializer(many=True, )
     class Meta:
         model = UserProfile
         fields = ('profile_image', 'abilities', 'keywords', )

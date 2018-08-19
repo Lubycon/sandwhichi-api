@@ -7,6 +7,8 @@ from user.models import User
 from user.serializers import UserSimpleSerializer
 from django.shortcuts import get_object_or_404
 from base.exceptions import BadRequest
+from django.core.exceptions import ObjectDoesNotExist
+from common.models import Ability, Keyword
 
 
 class IsExistEmailViewSet(APIView):
@@ -56,4 +58,64 @@ class MeViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         serializer = UserSimpleSerializer(request.user)
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def add_ability(self, request, *args, **kwargs):
+        me = request.user
+        my_profile = me.profile
+        ability_string = request.data.get('ability')
+        try:
+            my_profile.abilities.get(name=ability_string)
+            return Response({}, status=status.HTTP_409_CONFLICT)
+        except ObjectDoesNotExist:
+            ability, created = Ability.objects.get_or_create(name=ability_string)
+            new_count = ability.count + 1
+            ability.count = new_count
+            ability.save()
+            my_profile.abilities.add(ability)
+
+            serializer = UserSimpleSerializer(me)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def remove_ability(self, request, *args, **kwargs):
+        me = request.user
+        my_profile = me.profile
+        ability = get_object_or_404(my_profile.abilities, id=kwargs.get('ability_id'))
+
+        new_count = ability.count - 1
+        ability.count = new_count
+        ability.save()
+        my_profile.abilities.remove(ability)
+
+        serializer = UserSimpleSerializer(me)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def add_keyword(self, request, *args, **kwargs):
+        me = request.user
+        my_profile = me.profile
+        keyword_string = request.data.get('keyword')
+        try:
+            my_profile.keywords.get(name=keyword_string)
+            return Response({}, status=status.HTTP_409_CONFLICT)
+        except ObjectDoesNotExist:
+            keyword, created = Keyword.objects.get_or_create(name=keyword_string)
+            new_count = keyword.count + 1
+            keyword.count = new_count
+            keyword.save()
+            my_profile.keywords.add(keyword)
+
+            serializer = UserSimpleSerializer(me)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def remove_keyword(self, request, *args, **kwargs):
+        me = request.user
+        my_profile = me.profile
+        keyword = get_object_or_404(my_profile.keywords, id=kwargs.get('keyword_id'))
+
+        new_count = keyword.count - 1
+        keyword.count = new_count
+        keyword.save()
+        my_profile.keywords.remove(keyword)
+
+        serializer = UserSimpleSerializer(me)
         return Response(serializer.data, status=status.HTTP_200_OK)
