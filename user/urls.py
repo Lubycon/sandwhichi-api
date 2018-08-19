@@ -9,6 +9,9 @@ user_list = user_views.UserViewSet.as_view({
 user_detail = user_views.UserViewSet.as_view({
     'get': 'retrieve',
 })
+user_projects = user_views.UserViewSet.as_view({
+    'get': 'get_projects',
+})
 
 my_info = user_views.MeViewSet.as_view({
     'get': 'retrieve',
@@ -30,6 +33,7 @@ urlpatterns = [
     url(r'users/exists/email/', user_views.IsExistEmailViewSet.as_view(), name='is-exist-email'),
     url(r'^users/$', user_list, name='user-list'),
     url(r'^users/(?P<user_id>[0-9]+)/$', user_detail, name='user-detail'),
+    url(r'^users/(?P<user_id>[0-9]+)/projects/$', user_projects, name='user-projects'),
 
     url(r'^users/me/$', my_info, name='my-info'),
     url(r'^users/me/abilities/$', my_abilities, name='my-abilities'),

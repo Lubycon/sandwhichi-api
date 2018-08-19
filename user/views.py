@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from base.exceptions import BadRequest
 from django.core.exceptions import ObjectDoesNotExist
 from common.models import Ability, Keyword
+from project.models import ProjectMember
 
 
 class IsExistEmailViewSet(APIView):
@@ -46,10 +47,16 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
-        project_object = get_object_or_404(User, pk=kwargs.get('user_id'))
-        serializer = UserSimpleSerializer(project_object)
+        user = get_object_or_404(User, pk=kwargs.get('user_id'))
+        serializer = UserSimpleSerializer(user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # def get_projects(self, request, *args, **kwargs):
+    #     user = get_object_or_404(User, pk=kwargs.get('user_id'))
+    #     my_projects = ProjectMember.objects.filter(user=user, is_active=True, )
+    #     serializer = UserProjectSerializer(my_projects, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MeViewSet(viewsets.ModelViewSet):

@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from user.models import User, UserProfile
+# from project.models import ProjectMember
+# from project.serializers import ProjectSerializer
 from common.serializers import AbilitySerializer, KeywordSerializer
 
 class SignupUserSerializer(serializers.ModelSerializer):
@@ -74,7 +76,7 @@ class MyUserSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'profile',)
+        fields = ('id', 'email', 'username', 'profile', )
 
 
 class UserSimpleSerializer(serializers.ModelSerializer):
@@ -84,6 +86,14 @@ class UserSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'profile', )
+        fields = ('id', 'email', 'username', 'profile',)
+
+
+# class UserProjectSerializer(serializers.ModelSerializer):
+#     project = ProjectSerializer()
+#
+#     class Meta:
+#         model = ProjectMember
+#         fields = ('role', 'project', )
 
 
