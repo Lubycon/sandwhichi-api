@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import datetime
 import json
+from ast import literal_eval
 
-APPLICATION_ENV = os.environ.get("APPLICATION_ENV", 'local')
+APPLICATION_ENV = os.environ.get('APPLICATION_ENV', 'local')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -30,12 +31,11 @@ if 'SERVERTYPE' not in os.environ:
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG") == 'True'
-
-ALLOWED_HOSTS = list(os.environ.get("ALLOWED_HOSTS"))
+DEBUG = os.environ.get('DEBUG') == 'True'
+ALLOWED_HOSTS = literal_eval(os.environ.get('ALLOWED_HOSTS'))
 
 # Application definition
 AUTH_USER_MODEL = 'user.User'
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,14 +66,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-
     'base.middlewares.APIResponseMiddleWare',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = tuple(os.environ.get("ALLOWED_HOSTS"))
+CORS_ORIGIN_WHITELIST = literal_eval(os.environ.get('CORS_ORIGIN_WHITELIST'))
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -104,18 +102,18 @@ SWAGGER_SETTINGS = {
 }
 
 # S3 bucket settings
-AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_S3_ACCESS_KEY_ID")
-AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_S3_SECRET_ACCESS_KEY")
-RAW_IMAGE_BUCKET_BASE_URL = os.environ.get("RAW_IMAGE_BUCKET_BASE_URL")
-RAW_IMAGE_BUCKET_NAME = os.environ.get("RAW_IMAGE_BUCKET_NAME")
-RAW_IMAGE_BUCKET_REGION_NAME = os.environ.get("RAW_IMAGE_BUCKET_REGION_NAME")
+AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID')
+AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY')
+RAW_IMAGE_BUCKET_BASE_URL = os.environ.get('RAW_IMAGE_BUCKET_BASE_URL')
+RAW_IMAGE_BUCKET_NAME = os.environ.get('RAW_IMAGE_BUCKET_NAME')
+RAW_IMAGE_BUCKET_REGION_NAME = os.environ.get('RAW_IMAGE_BUCKET_REGION_NAME')
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")  # AWS_SES_ACCESS_KEY_ID
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")  # AWS_SES_SECRET_ACCESS_KEY
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')  # AWS_SES_ACCESS_KEY_ID
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # AWS_SES_SECRET_ACCESS_KEY
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'Sandwhichi <noreply@sandwhichi.com>'
 EMAIL_SUBJECT_PREFIX = '[Sandwhichi]'
@@ -147,11 +145,11 @@ WSGI_APPLICATION = 'wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':  os.environ.get("DATABASE_MASTER_NAME"),
-        'USER':  os.environ.get("DATABASE_MASTER_USER"),
-        'PASSWORD':  os.environ.get("DATABASE_MASTER_PASSWORD"),
-        'HOST':  os.environ.get("DATABASE_MASTER_HOST"),
-        'PORT':  os.environ.get("DATABASE_MASTER_PORT"),
+        'NAME':  os.environ.get('DATABASE_MASTER_NAME'),
+        'USER':  os.environ.get('DATABASE_MASTER_USER'),
+        'PASSWORD':  os.environ.get('DATABASE_MASTER_PASSWORD'),
+        'HOST':  os.environ.get('DATABASE_MASTER_HOST'),
+        'PORT':  os.environ.get('DATABASE_MASTER_PORT'),
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
             'charset': 'utf8mb4',
